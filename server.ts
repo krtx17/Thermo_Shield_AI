@@ -3,6 +3,10 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import { app } from "./server/app.js";
 import { config } from "./server/config/index.js";
+import { initPostgresDatabase } from "./server/db/postgres.js";
+import { hotspotRepository } from "./server/repositories/hotspot.repository.js";
+import { auditRepository } from "./server/repositories/audit.repository.js";
+import { reportRepository } from "./server/repositories/report.repository.js";
 
 // Re-export domain interfaces for backward-compatibility
 export type { HotspotRecord } from "./server/models/hotspot.model.js";
@@ -11,10 +15,19 @@ export type { IncidentReportRecord } from "./server/models/report.model.js";
 
 /**
  * Bootstrap Server:
- * Binds Vite middleware (in development) or static files (in production),
- * then begins listening on configured port.
+ * Initializes PostgreSQL database, binds Vite middleware (in development)
+ * or static files (in production), then begins listening on configured port.
  */
 async function startServer() {
+  const isDbReady = await initPostgresDatabase();
+  if (isDbReady) {
+    await Promise.all([
+      hotspotRepository.syncWithPostgres(),
+      auditRepository.syncWithPostgres(),
+      reportRepository.syncWithPostgres(),
+    ]);
+  }
+
   const isProduction = config.nodeEnv === "production";
 
   if (!isProduction) {

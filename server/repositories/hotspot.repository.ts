@@ -1,143 +1,31 @@
 import { HotspotRecord, HotspotFilterOptions } from "../models/hotspot.model.js";
-
-/**
- * Benchmark Hotspot Telemetry Dataset
- * Calibrated with real multispectral bands (Sentinel-2 L2A & VIIRS FRP).
- */
-const INITIAL_HOTSPOTS: HotspotRecord[] = [
-  {
-    id: "EVT-20260903-0042",
-    name: "Paradip Coastal Petrochemical Enclave",
-    region: "Odisha Industrial Corridor",
-    coordinates: "20.1234° N, 85.7654° E",
-    priority: "HIGH-ASSET",
-    severity: "CRITICAL",
-    riskScore: 78.4,
-    detectedAt: "2026-09-03 14:18:22 UTC",
-    meanFRP: 342.0,
-    peakFRP: 418.5,
-    distanceToAsset: "412m",
-    assetType: "Hydrocarbon Refining",
-    osmIdentifier: "way/94827104",
-    roadAccess: "120m (SH-12 Link)",
-    nearestFireStation: "4.2 km (Paradip Port)",
-    terrainCover: "Hardened Asphalt / Metal",
-    activeFlameProb: 91.2,
-    refineryProximityProb: 88.5,
-    persistenceIndex: 72.0,
-    detections30d: 18,
-    detections90d: 47,
-    trend30d: "+12.3 MW/wk",
-    sensors: ["VIIRS-FRP", "OSM-GEO", "SENTINEL-L2A", "TEMPORAL-REC"],
-    ndvi: -0.18,
-    nbr: 0.74,
-    ndmi: 0.42,
-    swirNir: 2.81,
-    formula: "0.45(P_fire) + 0.35(P_ind) + 0.20(P_pers) = 78.4",
-    defaultSummary: "This event is classified as CRITICAL with a risk score of 78.4/100. Key telemetry: FRP mean of 342 MW at 412m proximity to a known oil refinery inside the designated Odisha Industrial Corridor. Temporal analysis reveals 18 detections in 30 days with a positive upward slope (+12.3 MW/week). ConvNeXt-Tiny multispectral classification confirms Active Industrial Fire with 91.2% confidence. Simulated Grad-CAM analysis isolates thermal activation concentrated directly on processing units rather than open flare pits.",
-    recommendation: "Recommend immediate site verification and priority alert to refinery safety dispatch. Notify District Emergency Ops Center (DEOC)."
-  },
-  {
-    id: "EVT-20260903-0089",
-    name: "Dahej Special Economic Chemical Zone",
-    region: "Gujarat Petrochem Belt",
-    coordinates: "21.7051° N, 72.5857° E",
-    priority: "HIGH-ASSET",
-    severity: "HIGH RISK",
-    riskScore: 51.2,
-    detectedAt: "2026-09-03 13:42:10 UTC",
-    meanFRP: 144.0,
-    peakFRP: 162.0,
-    distanceToAsset: "1,302m",
-    assetType: "Specialty Polymer Plant",
-    osmIdentifier: "way/72891244",
-    roadAccess: "240m (GIDC Avenue 2)",
-    nearestFireStation: "6.8 km (Dahej Fire Station)",
-    terrainCover: "Soil / Sparsely Vegetated",
-    activeFlameProb: 84.6,
-    refineryProximityProb: 55.2,
-    persistenceIndex: 44.0,
-    detections30d: 9,
-    detections90d: 22,
-    trend30d: "+4.1 MW/wk",
-    sensors: ["VIIRS-FRP", "OSM-GEO", "SENTINEL-L2A"],
-    ndvi: 0.12,
-    nbr: 0.38,
-    ndmi: 0.15,
-    swirNir: 1.65,
-    formula: "0.45(P_fire) + 0.35(P_ind) + 0.20(P_pers) = 51.2",
-    defaultSummary: "This event is flagged as HIGH RISK with a deterministic risk score of 51.2/100. Active flame probability is estimated at 84.6%, operating at a distance of 1,302m from primary chemical storage facilities. Historical 30-day recurrence remains moderate with 9 detections. SWIR-based indices suggest active surface carbonization but less intense radiant power output compared to the Odisha refinery crisis.",
-    recommendation: "Issue preventative advisory warning to site supervisors. Increase monitoring rate to 15-minute Sentinel-2 pre-pass tasking."
-  },
-  {
-    id: "EVT-20260902-0031",
-    name: "Jharkhand Steel Cluster",
-    region: "Jamshedpur Industrial Zone",
-    coordinates: "22.7925° N, 86.1842° E",
-    priority: "MODERATE-ASSET",
-    severity: "MODERATE",
-    riskScore: 34.2,
-    detectedAt: "2026-09-02 09:12:44 UTC",
-    meanFRP: 94.5,
-    peakFRP: 110.0,
-    distanceToAsset: "1,800m",
-    assetType: "Blast Furnace Area",
-    osmIdentifier: "way/10492812",
-    roadAccess: "500m (Industrial Link)",
-    nearestFireStation: "8.1 km (Jamshedpur Sector 4)",
-    terrainCover: "Concrete / Built-up",
-    activeFlameProb: 52.0,
-    refineryProximityProb: 24.1,
-    persistenceIndex: 31.0,
-    detections30d: 5,
-    detections90d: 14,
-    trend30d: "+0.8 MW/wk",
-    sensors: ["VIIRS-FRP", "SENTINEL-L2A"],
-    ndvi: 0.04,
-    nbr: 0.15,
-    ndmi: 0.08,
-    swirNir: 1.10,
-    formula: "0.45(P_fire) + 0.35(P_ind) + 0.20(P_pers) = 34.2",
-    defaultSummary: "An anomaly detected in Jharkhand Steel Cluster with a score of 34.2/100 (MODERATE). Highly localized slag dump thermal flare activity, located roughly 1.8km away from core structures. High stability index and low 30-day trend indicate normal operational cooling cycles.",
-    recommendation: "Log event to general audit log. Standard automatic tracking. No tactical deployment needed."
-  },
-  {
-    id: "EVT-20260902-0012",
-    name: "Nagpur Logistics Hub",
-    region: "Maharashtra Central Corridor",
-    coordinates: "21.1458° N, 79.0882° E",
-    priority: "LOW-ASSET",
-    severity: "MONITORED",
-    riskScore: 18.1,
-    detectedAt: "2026-09-02 04:30:15 UTC",
-    meanFRP: 31.2,
-    peakFRP: 45.0,
-    distanceToAsset: "3,200m",
-    assetType: "Agricultural Storage Yards",
-    osmIdentifier: "way/59827110",
-    roadAccess: "1.2 km (National Highway)",
-    nearestFireStation: "12.0 km (Nagpur Rural)",
-    terrainCover: "Cropland / Bare Soil",
-    activeFlameProb: 15.4,
-    refineryProximityProb: 5.0,
-    persistenceIndex: 12.0,
-    detections30d: 2,
-    detections90d: 3,
-    trend30d: "-2.4 MW/wk",
-    sensors: ["VIIRS-FRP"],
-    ndvi: 0.45,
-    nbr: 0.05,
-    ndmi: -0.12,
-    swirNir: 0.65,
-    formula: "0.45(P_fire) + 0.35(P_ind) + 0.20(P_pers) = 18.1",
-    defaultSummary: "Low severity hotspot observed near Nagpur Logistics Hub, scoring 18.1/100 (MONITORED). Class 4 anomaly indicative of minor biomass residue controlled agricultural burning. Rapidly decaying thermal signature.",
-    recommendation: "No operational response needed. Flagged as seasonal agricultural stubble clearing."
-  }
-];
+import { INITIAL_HOTSPOTS, mapRowToHotspot } from "../db/seeds.js";
+import { getPostgresPool, isPostgresConnected } from "../db/postgres.js";
 
 export class HotspotRepository {
   private hotspots: HotspotRecord[] = [...INITIAL_HOTSPOTS];
 
+  /**
+   * Synchronize local memory cache from PostgreSQL if connected
+   */
+  public async syncWithPostgres(): Promise<void> {
+    const pool = getPostgresPool();
+    if (!pool || !isPostgresConnected()) return;
+
+    try {
+      const res = await pool.query("SELECT * FROM hotspots ORDER BY id ASC;");
+      if (res.rows && res.rows.length > 0) {
+        this.hotspots = res.rows.map(mapRowToHotspot);
+        console.log(`[HotspotRepository] Synced ${this.hotspots.length} hotspots from PostgreSQL.`);
+      }
+    } catch (err: any) {
+      console.warn("[HotspotRepository Sync Error]:", err?.message);
+    }
+  }
+
+  /**
+   * Query all hotspots from memory cache (with optional filtering)
+   */
   public findAll(options?: HotspotFilterOptions): HotspotRecord[] {
     let result = [...this.hotspots];
     if (!options) return result;
@@ -162,8 +50,132 @@ export class HotspotRepository {
     return result;
   }
 
+  /**
+   * Async query querying PostgreSQL directly if connected, falling back to in-memory
+   */
+  public async findAllAsync(options?: HotspotFilterOptions): Promise<HotspotRecord[]> {
+    const pool = getPostgresPool();
+    if (pool && isPostgresConnected()) {
+      try {
+        let query = "SELECT * FROM hotspots WHERE 1=1";
+        const params: any[] = [];
+
+        if (options?.severity) {
+          params.push(options.severity.toUpperCase());
+          query += ` AND UPPER(severity) = $${params.length}`;
+        }
+        if (options?.minRiskScore !== undefined) {
+          params.push(options.minRiskScore);
+          query += ` AND risk_score >= $${params.length}`;
+        }
+        if (options?.region) {
+          params.push(`%${options.region}%`);
+          query += ` AND region ILIKE $${params.length}`;
+        }
+        if (options?.search) {
+          params.push(`%${options.search}%`);
+          query += ` AND (name ILIKE $${params.length} OR id ILIKE $${params.length} OR asset_type ILIKE $${params.length})`;
+        }
+
+        query += " ORDER BY id ASC;";
+        const res = await pool.query(query, params);
+        if (res.rows) {
+          return res.rows.map(mapRowToHotspot);
+        }
+      } catch (err: any) {
+        console.warn("[HotspotRepository findAllAsync Error]:", err?.message);
+      }
+    }
+    return this.findAll(options);
+  }
+
   public findById(id: string): HotspotRecord | undefined {
     return this.hotspots.find(h => h.id === id);
+  }
+
+  public async findByIdAsync(id: string): Promise<HotspotRecord | undefined> {
+    const pool = getPostgresPool();
+    if (pool && isPostgresConnected()) {
+      try {
+        const res = await pool.query("SELECT * FROM hotspots WHERE id = $1 LIMIT 1;", [id]);
+        if (res.rows && res.rows.length > 0) {
+          return mapRowToHotspot(res.rows[0]);
+        }
+        return undefined;
+      } catch (err: any) {
+        console.warn("[HotspotRepository findByIdAsync Error]:", err?.message);
+      }
+    }
+    return this.findById(id);
+  }
+
+  /**
+   * Save or update a hotspot record in memory and PostgreSQL
+   */
+  public async save(hotspot: HotspotRecord): Promise<HotspotRecord> {
+    const idx = this.hotspots.findIndex(h => h.id === hotspot.id);
+    if (idx >= 0) {
+      this.hotspots[idx] = hotspot;
+    } else {
+      this.hotspots.push(hotspot);
+    }
+
+    const pool = getPostgresPool();
+    if (pool && isPostgresConnected()) {
+      try {
+        await pool.query(`
+          INSERT INTO hotspots (
+            id, name, region, coordinates, priority, severity, risk_score, detected_at,
+            mean_frp, peak_frp, distance_to_asset, asset_type, osm_identifier, road_access,
+            nearest_fire_station, terrain_cover, active_flame_prob, refinery_proximity_prob,
+            persistence_index, detections_30d, detections_90d, trend_30d, sensors,
+            ndvi, nbr, ndmi, swir_nir, formula, default_summary, recommendation
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30)
+          ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            region = EXCLUDED.region,
+            coordinates = EXCLUDED.coordinates,
+            priority = EXCLUDED.priority,
+            severity = EXCLUDED.severity,
+            risk_score = EXCLUDED.risk_score,
+            detected_at = EXCLUDED.detected_at,
+            mean_frp = EXCLUDED.mean_frp,
+            peak_frp = EXCLUDED.peak_frp,
+            distance_to_asset = EXCLUDED.distance_to_asset,
+            asset_type = EXCLUDED.asset_type,
+            osm_identifier = EXCLUDED.osm_identifier,
+            road_access = EXCLUDED.road_access,
+            nearest_fire_station = EXCLUDED.nearest_fire_station,
+            terrain_cover = EXCLUDED.terrain_cover,
+            active_flame_prob = EXCLUDED.active_flame_prob,
+            refinery_proximity_prob = EXCLUDED.refinery_proximity_prob,
+            persistence_index = EXCLUDED.persistence_index,
+            detections_30d = EXCLUDED.detections_30d,
+            detections_90d = EXCLUDED.detections_90d,
+            trend_30d = EXCLUDED.trend_30d,
+            sensors = EXCLUDED.sensors,
+            ndvi = EXCLUDED.ndvi,
+            nbr = EXCLUDED.nbr,
+            ndmi = EXCLUDED.ndmi,
+            swir_nir = EXCLUDED.swir_nir,
+            formula = EXCLUDED.formula,
+            default_summary = EXCLUDED.default_summary,
+            recommendation = EXCLUDED.recommendation;
+        `, [
+          hotspot.id, hotspot.name, hotspot.region, hotspot.coordinates, hotspot.priority, hotspot.severity,
+          hotspot.riskScore, hotspot.detectedAt, hotspot.meanFRP, hotspot.peakFRP, hotspot.distanceToAsset,
+          hotspot.assetType, hotspot.osmIdentifier, hotspot.roadAccess, hotspot.nearestFireStation,
+          hotspot.terrainCover, hotspot.activeFlameProb, hotspot.refineryProximityProb,
+          hotspot.persistenceIndex, hotspot.detections30d, hotspot.detections90d, hotspot.trend30d,
+          JSON.stringify(hotspot.sensors), hotspot.ndvi, hotspot.nbr, hotspot.ndmi, hotspot.swirNir,
+          hotspot.formula, hotspot.defaultSummary, hotspot.recommendation
+        ]);
+      } catch (err: any) {
+        console.warn("[HotspotRepository Save DB Error]:", err?.message);
+      }
+    }
+
+    return hotspot;
   }
 
   public count(): number {

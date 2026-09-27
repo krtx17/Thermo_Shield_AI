@@ -8,6 +8,12 @@ export interface AppConfig {
   geminiApiKey: string | undefined;
   geminiModel: string;
   isGeminiConfigured: boolean;
+  databaseUrl: string | undefined;
+  pgHost: string;
+  pgPort: number;
+  pgUser: string;
+  pgPassword: string | undefined;
+  pgDatabase: string;
 }
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
@@ -23,4 +29,10 @@ export const config: AppConfig = {
   geminiApiKey,
   geminiModel: process.env.GEMINI_MODEL || "gemini-2.5-flash",
   isGeminiConfigured,
+  databaseUrl: process.env.DATABASE_URL,
+  pgHost: process.env.PGHOST || "localhost",
+  pgPort: process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : 5432,
+  pgUser: process.env.PGUSER || "postgres",
+  pgPassword: process.env.PGPASSWORD,
+  pgDatabase: process.env.PGDATABASE || "thermo_shield",
 };

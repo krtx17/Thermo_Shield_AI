@@ -4,6 +4,8 @@ import { hotspotService } from "../services/hotspot.service.js";
 import { auditService } from "../services/audit.service.js";
 import { reportService } from "../services/report.service.js";
 
+import { getDatabaseStatus } from "../db/postgres.js";
+
 export class HealthController {
   public static getHealth(req: Request, res: Response): void {
     const isConfigured = config.isGeminiConfigured;
@@ -14,6 +16,7 @@ export class HealthController {
       uptimeSeconds: Math.floor(process.uptime()),
       geminiConfigured: isConfigured,
       model: isConfigured ? config.geminiModel : "Deterministic Heuristic Engine (Fallback)",
+      database: getDatabaseStatus(),
       hotspotsCount: hotspotService.getHotspotCount(),
       auditLogsCount: auditService.getLogCount(),
       incidentReportsCount: reportService.getReportCount(),
