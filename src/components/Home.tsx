@@ -102,7 +102,7 @@ export default function Home({
   const hotspotMarkers = hotspots.map((h) => parseCoordinates(h.coordinates));
 
   return (
-    <div className="relative w-full h-[calc(100vh-64px)] overflow-hidden flex flex-col select-none bg-[#070b14] text-white">
+    <div className="relative w-full h-[calc(100vh-64px)] overflow-hidden flex flex-col select-none bg-transparent text-white">
       
       {/* Top Floating View Switcher (3D Earth Globe vs Industrial Aerial) */}
       <div className="absolute top-4 left-6 z-40 flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function Home({
           <div 
             className="absolute inset-0 z-0 pointer-events-none"
             style={{
-              background: "radial-gradient(ellipse at 50% 50%, rgba(14, 165, 233, 0.08) 0%, rgba(6, 11, 22, 0.7) 45%, #070b14 100%)"
+              background: "radial-gradient(ellipse at 50% 50%, rgba(14, 165, 233, 0.12) 0%, rgba(6, 11, 22, 0.3) 60%, transparent 100%)"
             }}
           />
 

@@ -18,6 +18,7 @@ import {
   BarChart2, 
   Menu
 } from "lucide-react";
+import Particles from "./components/Particles";
 
 // Fallback seed data in case of network latency
 const INITIAL_MOCK_HOTSPOTS: Hotspot[] = [
@@ -166,26 +167,44 @@ export default function App() {
   const criticalCount = hotspots.filter(h => h.severity === "CRITICAL" || h.severity === "HIGH RISK").length;
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 flex flex-row ${
-      isDark ? "bg-[#080d1a] text-white" : "bg-[#f0f4f9] text-slate-900"
-    } selection:bg-[#2563eb] selection:text-white antialiased`}>
+    <div className="relative min-h-screen flex flex-row bg-[#070b14] text-white selection:bg-[#2563eb] selection:text-white antialiased overflow-hidden">
       
       {/* ========================================================================= */}
-      {/* DESKTOP & MOBILE SIDEBAR (Matching FireSight & FireSense) */}
+      {/* REACT BITS PARTICLES BACKGROUND — Full viewport ambient particle field */}
       {/* ========================================================================= */}
-      <Sidebar
-        activeScreen={activeScreen}
-        setActiveScreen={setActiveScreen}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        theme={theme}
-        activeAlertsCount={criticalCount || 3}
-      />
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-75">
+        <Particles
+          particleColors={["#38bdf8", "#818cf8", "#ffffff", "#0284c7"]}
+          particleCount={200}
+          particleSpread={12}
+          speed={0.12}
+          particleBaseSize={90}
+          moveParticlesOnHover={true}
+          particleHoverFactor={0.6}
+          alphaParticles={true}
+          disableRotation={false}
+          cameraDistance={20}
+        />
+      </div>
+
+      {/* ========================================================================= */}
+      {/* DESKTOP & MOBILE SIDEBAR */}
+      {/* ========================================================================= */}
+      <div className="relative z-10">
+        <Sidebar
+          activeScreen={activeScreen}
+          setActiveScreen={setActiveScreen}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          theme={theme}
+          activeAlertsCount={criticalCount || 3}
+        />
+      </div>
 
       {/* ========================================================================= */}
       {/* MAIN CONTENT AREA: HEADER + ACTIVE SCREEN VIEW */}
       {/* ========================================================================= */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
+      <div className="relative z-10 flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
         
         {/* Top Header Bar */}
         <Header
