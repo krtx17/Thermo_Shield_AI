@@ -13,8 +13,7 @@ import {
   MapPin, 
   Layers, 
   Sparkles, 
-  ChevronRight,
-  RotateCw
+  ChevronRight
 } from "lucide-react";
 
 interface HomeProps {
@@ -47,7 +46,6 @@ export default function Home({
 }: HomeProps) {
   // Visual mode: 'globe' (Originkit 3D Earth) or 'aerial' (Tactical Facility Map)
   const [viewMode, setViewMode] = useState<"globe" | "aerial">("globe");
-  const [liveMonitoring, setLiveMonitoring] = useState(true);
 
   // Scrubber controls for aerial view
   const [isPlaying, setIsPlaying] = useState(true);
@@ -151,7 +149,7 @@ export default function Home({
           <div className="absolute inset-0 z-10 flex items-center justify-center">
             <div className="w-full h-full max-w-[850px] max-h-[640px] flex items-center justify-center">
               <Globe
-                speed={liveMonitoring ? 1.6 : 0}
+                speed={1.6}
                 smoothing={8}
                 dots={{
                   color: "#38bdf8",
@@ -225,23 +223,6 @@ export default function Home({
             </div>
           </div>
 
-          {/* Floating Mid Controls: Interactive Orbit Pill */}
-          <div className="relative z-30 flex items-center justify-center pointer-events-none">
-            <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b101d]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg text-xs text-slate-300">
-              <button
-                onClick={() => setLiveMonitoring(!liveMonitoring)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#141d33] hover:bg-[#1e2c4d] text-white transition-colors cursor-pointer text-[11px] font-semibold"
-              >
-                {liveMonitoring ? <Pause className="h-3 w-3 text-cyan-400" /> : <Play className="h-3 w-3 text-cyan-400" />}
-                <span>{liveMonitoring ? "Auto-Orbiting" : "Paused"}</span>
-              </button>
-              <span className="text-slate-600">|</span>
-              <div className="flex items-center gap-1 text-[11px] text-slate-400">
-                <RotateCw className="h-3 w-3 text-slate-400" />
-                <span>Drag globe to inspect regions</span>
-              </div>
-            </div>
-          </div>
 
           {/* Bottom Row: Left 3 Metric Cards + Center Hotspot Quick Select + Right Legend */}
           <div className="relative z-30 px-6 sm:px-10 pb-6 flex flex-col sm:flex-row items-end justify-between gap-4 pointer-events-none">
