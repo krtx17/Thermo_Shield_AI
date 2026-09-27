@@ -68,42 +68,18 @@ export default function Settings({
             <span>Theme & Visual Style</span>
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button
-              onClick={() => setTheme("dark")}
-              className={`p-3.5 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
-                isDark 
-                  ? "bg-[#18233a] border-[#2563eb] shadow-md shadow-blue-900/20" 
-                  : "bg-[#111a2e] border-[#1e2c4a] hover:bg-[#141d33]"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Moon className="h-5 w-5 text-indigo-400" />
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-white">FireSight (Dark)</span>
-                  <span className="text-[11px] text-slate-400">Tactical night aerial view</span>
+          <div className="p-3.5 rounded-xl border bg-[#18233a] border-[#2563eb] shadow-md shadow-blue-900/20 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Moon className="h-5 w-5 text-indigo-400" />
+              <div className="flex flex-col text-left">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-white">Unified Command Dark Theme</span>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">Active & Locked</span>
                 </div>
+                <span className="text-[11px] text-slate-400">High-contrast tactical dark interface with zero visual bleed</span>
               </div>
-              {isDark && <Check className="h-4 w-4 text-[#2563eb]" />}
-            </button>
-
-            <button
-              onClick={() => setTheme("light")}
-              className={`p-3.5 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
-                !isDark 
-                  ? "bg-[#18233a] border-[#2563eb] shadow-md shadow-blue-900/20" 
-                  : "bg-[#111a2e] border-[#1e2c4a] hover:bg-[#141d33]"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Sun className="h-5 w-5 text-amber-400" />
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-white">FireSense (Light)</span>
-                  <span className="text-[11px] text-slate-400">Clean global thermal view</span>
-                </div>
-              </div>
-              {!isDark && <Check className="h-4 w-4 text-[#2563eb]" />}
-            </button>
+            </div>
+            <Check className="h-4 w-4 text-[#2563eb]" />
           </div>
         </div>
 

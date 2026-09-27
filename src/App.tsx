@@ -127,29 +127,17 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Persistent theme preference (Dark = FireSight, Light = FireSense)
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    const saved = localStorage.getItem("thermo-shield-theme");
-    return (saved === "light" || saved === "dark") ? saved : "dark";
-  });
+  // App Theme is locked to unified dark command center theme
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
-  const handleSetTheme = (newTheme: "light" | "dark") => {
-    setTheme(newTheme);
-    localStorage.setItem("thermo-shield-theme", newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+  const handleSetTheme = () => {
+    setTheme("dark");
+    document.documentElement.classList.add("dark");
   };
 
   useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
+    document.documentElement.classList.add("dark");
+  }, []);
 
   // Comparison IDs
   const [compareAId, setCompareAId] = useState<string>("EVT-20260903-0042");

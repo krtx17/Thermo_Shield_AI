@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Hotspot, ActiveScreen } from "../types";
-import EarthSphere3D from "./EarthSphere3D";
+import Globe from "./originkit/ui/globe";
 import { 
   Flame, 
   Play, 
@@ -13,48 +13,57 @@ import {
   MapPin, 
   Layers, 
   Sparkles, 
-  ChevronRight
+  ChevronRight,
+  RotateCw
 } from "lucide-react";
 
 interface HomeProps {
   hotspots: Hotspot[];
   setActiveScreen: (screen: ActiveScreen) => void;
   setSelectedHotspot: (hotspot: Hotspot) => void;
-  modelMode: "local" | "cloud";
-  theme: "light" | "dark";
+  modelMode?: "local" | "cloud";
+  theme?: "light" | "dark";
+}
+
+function parseCoordinates(coordStr: string): { lat: number; lng: number } {
+  if (!coordStr) return { lat: 20.5937, lng: 78.9629 };
+  const latMatch = coordStr.match(/([\d.]+)\s*°?\s*([NS])/i);
+  const lngMatch = coordStr.match(/([\d.]+)\s*°?\s*([EW])/i);
+  let lat = 20.5937;
+  let lng = 78.9629;
+  if (latMatch) {
+    lat = parseFloat(latMatch[1]) * (latMatch[2].toUpperCase() === "S" ? -1 : 1);
+  }
+  if (lngMatch) {
+    lng = parseFloat(lngMatch[1]) * (lngMatch[2].toUpperCase() === "W" ? -1 : 1);
+  }
+  return { lat, lng };
 }
 
 export default function Home({
   hotspots,
   setActiveScreen,
-  setSelectedHotspot,
-  theme
+  setSelectedHotspot
 }: HomeProps) {
-  const isDark = theme === "dark";
-
-  // Visual mode: defaults to 'globe' in light mode (FireSense), 'aerial' in dark mode (FireSight)
-  const [viewMode, setViewMode] = useState<"globe" | "aerial">(() => (isDark ? "aerial" : "globe"));
-
-  useEffect(() => {
-    setViewMode(isDark ? "aerial" : "globe");
-  }, [isDark]);
+  // Visual mode: 'globe' (Originkit 3D Earth) or 'aerial' (Tactical Facility Map)
+  const [viewMode, setViewMode] = useState<"globe" | "aerial">("globe");
+  const [liveMonitoring, setLiveMonitoring] = useState(true);
 
   // Scrubber controls for aerial view
   const [isPlaying, setIsPlaying] = useState(true);
   const [timeRange, setTimeRange] = useState<"1H" | "6H" | "24H" | "7D">("6H");
   const [scrubberValue, setScrubberValue] = useState(72);
-  const [liveMonitoring, setLiveMonitoring] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1);
 
   const defaultFallback: Hotspot = {
-    id: "EVT-2861-DEL",
-    name: "Paradip Petrochemical Enclave",
-    region: "Industrial Area",
-    coordinates: "28.6139° N, 77.2090° E",
+    id: "EVT-20260903-0042",
+    name: "Paradip Coastal Petrochemical Enclave",
+    region: "Odisha Industrial Corridor",
+    coordinates: "20.1234° N, 85.7654° E",
     priority: "HIGH-ASSET",
     severity: "CRITICAL",
     riskScore: 78.4,
-    detectedAt: "Apr 26, 2025 • 14:32 UTC",
+    detectedAt: "2026-09-03 14:18:22 UTC",
     meanFRP: 342.0,
     peakFRP: 418.5,
     distanceToAsset: "412m",
@@ -89,22 +98,21 @@ export default function Home({
     setActiveScreen("active-investigations");
   };
 
+  // Convert hotspots to 3D globe coordinates
+  const hotspotMarkers = hotspots.map((h) => parseCoordinates(h.coordinates));
+
   return (
-    <div className="relative w-full h-[calc(100vh-64px)] overflow-hidden flex flex-col select-none">
+    <div className="relative w-full h-[calc(100vh-64px)] overflow-hidden flex flex-col select-none bg-[#070b14] text-white">
       
       {/* Top Floating View Switcher (3D Earth Globe vs Industrial Aerial) */}
-      <div className="absolute top-4 left-4 z-40 flex items-center gap-2">
-        <div className={`p-1 rounded-xl border backdrop-blur-md flex items-center gap-1 shadow-sm ${
-          isDark 
-            ? "bg-[#0b101d]/85 border-[#1c2944] text-slate-300" 
-            : "bg-white/90 border-slate-200/90 text-slate-700"
-        }`}>
+      <div className="absolute top-4 left-6 z-40 flex items-center gap-2">
+        <div className="p-1 rounded-xl border backdrop-blur-md flex items-center gap-1 shadow-lg bg-[#0b101d]/90 border-[#1c2944] text-slate-300">
           <button
             onClick={() => setViewMode("globe")}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
               viewMode === "globe"
-                ? "bg-[#2563eb] text-white shadow-xs"
-                : isDark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                ? "bg-[#2563eb] text-white shadow-md shadow-blue-600/30"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             <Sparkles className="h-3.5 w-3.5" />
@@ -113,10 +121,10 @@ export default function Home({
 
           <button
             onClick={() => setViewMode("aerial")}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
               viewMode === "aerial"
-                ? "bg-[#2563eb] text-white shadow-xs"
-                : isDark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                ? "bg-[#2563eb] text-white shadow-md shadow-blue-600/30"
+                : "text-slate-400 hover:text-white"
             }`}
           >
             <Layers className="h-3.5 w-3.5" />
@@ -126,66 +134,90 @@ export default function Home({
       </div>
 
       {/* ========================================================================= */}
-      {/* VIEW 1: 3D TRUE SPHERICAL EARTH WITH PURE CLOUDS BACKGROUND */}
+      {/* VIEW 1: ORIGINKIT 3D INTERACTIVE GLOBE WITH UNIFIED DARK THEME */}
       {/* ========================================================================= */}
       {viewMode === "globe" && (
         <div className="relative w-full h-full overflow-hidden flex flex-col justify-between">
           
-          {/* PURE CLOUDS & SKY BACKGROUND (Zero Earth in Background) */}
+          {/* Subtle Ambient Nebula Background */}
           <div 
-            className="absolute inset-0 bg-cover bg-center z-0 pointer-events-none"
+            className="absolute inset-0 z-0 pointer-events-none"
             style={{
-              backgroundImage: "url('/pure_clouds_bg.jpg')"
+              background: "radial-gradient(ellipse at 50% 50%, rgba(14, 165, 233, 0.08) 0%, rgba(6, 11, 22, 0.7) 45%, #070b14 100%)"
             }}
           />
 
-          {/* Central True 3D Sphere (Sized cleanly so it never overlaps UI components) */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-            <div className="w-full h-full max-w-[430px] max-h-[430px] sm:max-w-[460px] sm:max-h-[460px] pointer-events-auto">
-              <EarthSphere3D
-                hotspots={hotspots}
-                onSelectHotspot={handleViewDetails}
-                isAutoRotating={liveMonitoring}
-                onToggleAutoRotate={() => setLiveMonitoring(!liveMonitoring)}
+          {/* Central 3D Originkit Globe Container - Cleanly Sized with Zero Overlaps */}
+          <div className="absolute inset-0 z-10 flex items-center justify-center">
+            <div className="w-full h-full max-w-[850px] max-h-[640px] flex items-center justify-center">
+              <Globe
+                speed={liveMonitoring ? 1.6 : 0}
+                smoothing={8}
+                dots={{
+                  color: "#38bdf8",
+                  size: 4,
+                  density: 8,
+                  allDots: false
+                }}
+                scale={7.5}
+                oceanColor="#060b18"
+                outlineColor="#0ea5e9"
+                showOutline={true}
+                outlineWidth={1}
+                graticuleColor="rgba(56, 189, 248, 0.12)"
+                showGrid={true}
+                dragSpeed={5}
+                stopOnHover={true}
+                initialLatitude={22}
+                initialLongitude={79}
+                markerConfig={{
+                  markers: hotspotMarkers,
+                  color: "#f43f5e",
+                  size: 45
+                }}
               />
             </div>
           </div>
 
           {/* ===================================================================== */}
-          {/* UI CONTENT WRITTEN OVER CLOUDS — ZERO OVERLAP WITH THE 3D SPHERE */}
+          {/* UI CONTENT OVERLAY — ENGINEERED FOR ZERO OVERLAPS WITH GLOBE */}
           {/* ===================================================================== */}
           
           {/* Top Row: Left Header Titles + Right Active Alerts Pill */}
           <div className="relative z-30 px-6 sm:px-10 pt-16 flex items-start justify-between gap-4 pointer-events-none">
             
-            {/* Main Heading & Subtitle — Small white font strictly over clouds, never overlapping globe */}
-            <div className="max-w-[260px] pointer-events-auto">
-              <h1 className="text-base sm:text-lg font-bold tracking-tight leading-snug text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+            {/* Main Heading & Subtitle */}
+            <div className="max-w-xs pointer-events-auto">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-blue-500/10 border border-blue-500/20 text-[#38bdf8] mb-2 shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                Orbital Defense Grid
+              </div>
+              <h1 className="text-lg sm:text-xl font-extrabold tracking-tight leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                 AI-Powered Detection<br />for a Safer Tomorrow
               </h1>
-              <p className="mt-1 text-xs font-normal leading-relaxed text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
-                Monitoring industrial fires and persistent thermal sources using satellite data.
+              <p className="mt-1.5 text-xs font-normal leading-relaxed text-slate-300 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+                Autonomous multispectral surveillance for defense corridors and hazardous petrochemical complexes.
               </p>
             </div>
 
-            {/* Top-Right Active Alerts Pill Card — Positioned comfortably down over clouds to avoid overlap */}
+            {/* Top-Right Active Alerts Pill Card */}
             <div 
               onClick={() => setActiveScreen("active-investigations")}
-              className="mt-24 sm:mt-28 p-3.5 px-4 rounded-2xl bg-white/90 hover:bg-white border border-white/80 backdrop-blur-md shadow-lg shadow-blue-900/5 flex items-center gap-3.5 transition-transform hover:scale-102 cursor-pointer pointer-events-auto shrink-0"
+              className="mt-1 p-3.5 px-4 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141f38] border border-[#1e2c4a] backdrop-blur-md shadow-xl flex items-center gap-3.5 transition-all hover:scale-102 cursor-pointer pointer-events-auto shrink-0"
             >
-              <div className="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-rose-500 shrink-0">
-                <Flame className="h-4.5 w-4.5 fill-rose-500" />
+              <div className="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0">
+                <Flame className="h-5 w-5 fill-rose-500" />
               </div>
 
               <div className="flex flex-col text-left">
-                <span className="text-[11px] font-semibold text-slate-500 leading-none">
+                <span className="text-[11px] font-semibold text-slate-400 leading-none">
                   Active Alerts
                 </span>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-lg font-bold text-slate-900 leading-none">
+                  <span className="text-xl font-bold text-white leading-none">
                     3
                   </span>
-                  <span className="text-[11px] font-medium text-slate-500 flex items-center gap-0.5">
+                  <span className="text-[11px] font-medium text-rose-400 flex items-center gap-0.5">
                     +2 since last hour <ChevronRight className="h-3 w-3" />
                   </span>
                 </div>
@@ -193,74 +225,116 @@ export default function Home({
             </div>
           </div>
 
-          {/* Bottom Row: Left 3 Metric Cards + Center Live Pill + Right Legend */}
+          {/* Floating Mid Controls: Interactive Orbit Pill */}
+          <div className="relative z-30 flex items-center justify-center pointer-events-none">
+            <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b101d]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg text-xs text-slate-300">
+              <button
+                onClick={() => setLiveMonitoring(!liveMonitoring)}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#141d33] hover:bg-[#1e2c4d] text-white transition-colors cursor-pointer text-[11px] font-semibold"
+              >
+                {liveMonitoring ? <Pause className="h-3 w-3 text-cyan-400" /> : <Play className="h-3 w-3 text-cyan-400" />}
+                <span>{liveMonitoring ? "Auto-Orbiting" : "Paused"}</span>
+              </button>
+              <span className="text-slate-600">|</span>
+              <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                <RotateCw className="h-3 w-3 text-slate-400" />
+                <span>Drag globe to inspect regions</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row: Left 3 Metric Cards + Center Hotspot Quick Select + Right Legend */}
           <div className="relative z-30 px-6 sm:px-10 pb-6 flex flex-col sm:flex-row items-end justify-between gap-4 pointer-events-none">
             
-            {/* Left 3 Floating Metric Cards — Written strictly over the lower-left clouds */}
-            <div className="flex flex-col gap-2.5 w-full sm:w-60 pointer-events-auto">
+            {/* Left 3 Floating Metric Cards */}
+            <div className="flex flex-col gap-2.5 w-full sm:w-64 pointer-events-auto">
               
               {/* Card 1: Satellites Monitored */}
-              <div className="p-3 rounded-2xl bg-white/85 hover:bg-white/95 border border-white/70 backdrop-blur-md shadow-md shadow-blue-900/5 flex items-center gap-3 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-[#2563eb] shrink-0">
+              <div className="p-3 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-[#38bdf8] shrink-0">
                   <Radio className="h-4.5 w-4.5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-slate-500">
+                  <span className="text-[10px] font-semibold text-slate-400">
                     Satellites Monitored
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-base font-bold text-slate-900">12</span>
-                    <span className="text-[10px] font-semibold text-emerald-600">↑ 2 active</span>
+                    <span className="text-base font-bold text-white">12</span>
+                    <span className="text-[10px] font-semibold text-emerald-400">↑ 2 active</span>
                   </div>
                 </div>
               </div>
 
               {/* Card 2: Regions Scanned */}
-              <div className="p-3 rounded-2xl bg-white/85 hover:bg-white/95 border border-white/70 backdrop-blur-md shadow-md shadow-blue-900/5 flex items-center gap-3 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0">
+              <div className="p-3 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
                   <MapPin className="h-4.5 w-4.5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-slate-500">
+                  <span className="text-[10px] font-semibold text-slate-400">
                     Regions Scanned
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-base font-bold text-slate-900">245</span>
-                    <span className="text-[10px] font-semibold text-emerald-600">↑ 12%</span>
+                    <span className="text-base font-bold text-white">245</span>
+                    <span className="text-[10px] font-semibold text-emerald-400">↑ 12%</span>
                   </div>
                 </div>
               </div>
 
               {/* Card 3: Potential Fire Detections */}
-              <div className="p-3 rounded-2xl bg-white/85 hover:bg-white/95 border border-white/70 backdrop-blur-md shadow-md shadow-blue-900/5 flex items-center gap-3 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+              <div className="p-3 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
                   <Flame className="h-4.5 w-4.5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-slate-500">
+                  <span className="text-[10px] font-semibold text-slate-400">
                     Potential Fire Detections
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-base font-bold text-slate-900">3</span>
-                    <span className="text-[10px] font-semibold text-rose-600">↑ 2 new</span>
+                    <span className="text-base font-bold text-white">3</span>
+                    <span className="text-[10px] font-semibold text-rose-400">↑ 2 critical</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Bottom-Right Legend Card — Over clouds in corner */}
-            <div className="hidden sm:flex flex-col gap-1.5 p-3 rounded-xl bg-white/90 border border-white/80 backdrop-blur-md shadow-md text-xs pointer-events-auto">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                <span className="text-slate-700 font-medium">Active Fire</span>
+            {/* Center Quick Hotspot Jump Buttons */}
+            <div className="hidden lg:flex items-center gap-2 p-1.5 rounded-2xl bg-[#0b101d]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg pointer-events-auto">
+              <span className="text-[10px] font-bold text-slate-400 px-2 uppercase tracking-wider">
+                Focus Target:
+              </span>
+              {hotspots.slice(0, 3).map((h) => (
+                <button
+                  key={h.id}
+                  onClick={() => handleViewDetails(h)}
+                  className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    h.severity === "CRITICAL"
+                      ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30"
+                      : "bg-[#141d33] text-slate-300 border border-[#1e2c4a] hover:bg-[#1a2642]"
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${h.severity === "CRITICAL" ? "bg-rose-500 animate-ping" : "bg-amber-400"}`} />
+                  <span>{h.name.split(" ")[0]}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Bottom-Right Legend Card */}
+            <div className="hidden sm:flex flex-col gap-2 p-3.5 rounded-2xl bg-[#0f172a]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg text-xs pointer-events-auto">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                Spectral Classification
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="text-slate-700 font-medium">Thermal Hotspot</span>
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
+                <span className="text-slate-200 font-medium text-[11px]">Active Fire (VIIRS FRP &gt; 150MW)</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                <span className="text-slate-700 font-medium">Monitoring Area</span>
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                <span className="text-slate-200 font-medium text-[11px]">Thermal Anomaly (SWIR Alert)</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                <span className="text-slate-200 font-medium text-[11px]">Monitored Enclave (Sentinel-2)</span>
               </div>
             </div>
 
@@ -270,7 +344,7 @@ export default function Home({
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW 2: INDUSTRIAL AERIAL VIEW (FireSight Dark Reference Image) */}
+      {/* VIEW 2: INDUSTRIAL AERIAL VIEW (Tactical High-Res Incident Facility View) */}
       {/* ========================================================================= */}
       {viewMode === "aerial" && (
         <div className="relative w-full h-full bg-[#080d19] flex items-center justify-center overflow-hidden">

@@ -9,7 +9,6 @@ import {
   GitCompare, 
   Sparkles, 
   Settings, 
-  Flame,
   Shield,
   X
 } from "lucide-react";
@@ -28,12 +27,8 @@ export default function Sidebar({
   setActiveScreen,
   isOpen,
   onClose,
-  theme = "dark",
   activeAlertsCount = 3
 }: SidebarProps) {
-  const isDark = theme === "dark";
-  const brandName = "Thermo Shield AI";
-
   const navItems: { id: ActiveScreen; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: "home", label: "Home", icon: HomeIcon },
     { id: "command-center", label: "Live Map", icon: MapIcon },
@@ -51,18 +46,14 @@ export default function Sidebar({
       <div 
         className={`fixed inset-0 z-40 transition-opacity duration-300 lg:hidden ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        } ${isDark ? "bg-black/60 backdrop-blur-xs" : "bg-slate-900/30 backdrop-blur-xs"}`}
+        } bg-black/60 backdrop-blur-xs`}
         onClick={onClose}
       />
 
       {/* Sidebar navigation */}
       <aside 
-        className={`fixed lg:sticky top-0 left-0 bottom-0 h-screen w-60 z-50 flex flex-col justify-between py-5 px-3 border-r transition-all duration-300 ease-in-out shrink-0 select-none ${
+        className={`fixed lg:sticky top-0 left-0 bottom-0 h-screen w-60 z-50 flex flex-col justify-between py-5 px-3 border-r transition-all duration-300 ease-in-out shrink-0 select-none bg-[#0b101d] border-[#18233a] text-white ${
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } ${
-          isDark 
-            ? "bg-[#0b101d] border-[#18233a] text-white" 
-            : "bg-white border-slate-200 text-slate-800 shadow-sm"
         }`}
       >
         <div className="flex flex-col gap-6">
@@ -80,9 +71,7 @@ export default function Sidebar({
                 />
               </div>
               <div className="flex flex-col">
-                <span className={`text-sm font-extrabold tracking-tight leading-none ${
-                  isDark ? "text-white" : "text-slate-900"
-                }`}>
+                <span className="text-sm font-extrabold tracking-tight leading-none text-white">
                   Thermo Shield AI
                 </span>
                 <span className="text-[10px] font-semibold text-[#38bdf8] leading-none mt-1">
@@ -94,9 +83,7 @@ export default function Sidebar({
             {/* Mobile close button */}
             <button 
               onClick={onClose}
-              className={`p-1.5 rounded-lg lg:hidden transition-colors ${
-                isDark ? "text-slate-400 hover:text-white hover:bg-slate-800" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
-              }`}
+              className="p-1.5 rounded-lg lg:hidden transition-colors text-slate-400 hover:text-white hover:bg-slate-800"
               type="button"
               aria-label="Close navigation"
             >
@@ -120,9 +107,7 @@ export default function Sidebar({
                   className={`w-full h-10 px-3.5 rounded-xl text-sm font-medium text-left transition-all duration-200 flex items-center justify-between cursor-pointer ${
                     isActive
                       ? "bg-[#2563eb] text-white shadow-sm shadow-blue-600/30 font-semibold"
-                      : isDark
-                        ? "text-[#8e9db7] hover:text-white hover:bg-[#141d33]"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      : "text-[#8e9db7] hover:text-white hover:bg-[#141d33]"
                   }`}
                   type="button"
                 >
@@ -146,35 +131,24 @@ export default function Sidebar({
           </nav>
         </div>
 
-        {/* Bottom Status Widget matching reference images */}
+        {/* Bottom Status Widget */}
         <div className="px-2 pt-4">
-          {isDark ? (
-            <div className="p-3 rounded-xl border flex items-center gap-2.5 bg-[#10172a] border-[#1b2742] text-slate-300">
-              <div className="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
-                <Shield className="h-4 w-4 text-[#2563eb]" />
-              </div>
-              <div className="flex flex-col">
+          <div className="p-3 rounded-xl border flex items-center gap-2.5 bg-[#10172a] border-[#1b2742] text-slate-300">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
+              <Shield className="h-4 w-4 text-[#2563eb]" />
+            </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-[11px] font-semibold leading-tight text-white">
-                  AI-Powered
-                </span>
-                <span className="text-[10px] leading-tight text-slate-400">
-                  Industrial Fire Detection
+                  Orbital Defense
                 </span>
               </div>
+              <span className="text-[10px] leading-tight text-slate-400 mt-0.5">
+                VIIRS & Sentinel-2 Active
+              </span>
             </div>
-          ) : (
-            <div className="flex items-center gap-2 px-1 py-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-[11px] font-semibold text-slate-800 leading-none">
-                  Live Satellite Feed
-                </span>
-                <span className="text-[10px] text-slate-400 mt-1 leading-none">
-                  Updated 5 min ago
-                </span>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </aside>
     </>

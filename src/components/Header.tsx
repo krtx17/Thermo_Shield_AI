@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { ActiveScreen, ModelMode } from "../types";
 import { 
   Search, 
-  Sun, 
-  Moon, 
   Menu as MenuIcon, 
   ChevronDown,
   CloudSun,
@@ -15,13 +13,13 @@ import {
 import profilePic from "../assets/images/archit_profile_1788707836364.jpg";
 
 interface HeaderProps {
-  activeScreen: ActiveScreen;
+  activeScreen?: ActiveScreen;
   setActiveScreen: (screen: ActiveScreen) => void;
   modelMode: ModelMode;
   setModelMode: (mode: ModelMode) => void;
   totalHotspots: number;
-  theme: "light" | "dark";
-  setTheme: (theme: "light" | "dark") => void;
+  theme?: "light" | "dark";
+  setTheme?: (theme: "light" | "dark") => void;
   onMenuToggle: () => void;
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
@@ -31,90 +29,67 @@ export default function Header({
   setActiveScreen,
   modelMode,
   setModelMode,
-  theme,
-  setTheme,
   onMenuToggle,
   searchQuery = "",
   setSearchQuery
 }: HeaderProps) {
-  const isDark = theme === "dark";
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
   return (
-    <header className={`h-16 px-4 lg:px-6 flex items-center justify-between border-b transition-colors duration-200 z-30 sticky top-0 backdrop-blur-md ${
-      isDark 
-        ? "bg-[#0b101d]/90 border-[#18233a] text-white" 
-        : "bg-white/90 border-slate-200 text-slate-800"
-    }`}>
+    <header className="h-16 px-4 lg:px-6 flex items-center justify-between border-b transition-colors duration-200 z-30 sticky top-0 backdrop-blur-md bg-[#0b101d]/90 border-[#18233a] text-white">
       {/* Left side: Mobile menu toggle + Global Search bar */}
       <div className="flex items-center gap-3 flex-1 max-w-xl">
         <button
           onClick={onMenuToggle}
-          className={`lg:hidden p-2 rounded-xl border transition-colors ${
-            isDark 
-              ? "border-[#1e2c4a] bg-[#10172a] text-slate-300 hover:text-white" 
-              : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
-          }`}
+          className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           type="button"
-          aria-label="Open menu"
+          aria-label="Open navigation menu"
         >
           <MenuIcon className="h-5 w-5" />
         </button>
 
-        {/* Search input matching reference images */}
         <div className="relative flex-1">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <Search className={`h-4 w-4 ${isDark ? "text-slate-400" : "text-slate-400"}`} />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-slate-400" />
           </div>
           <input
             type="text"
-            placeholder="Search location, coordinates or facility..."
             value={searchQuery}
             onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
-            className={`w-full h-10 pl-10 pr-4 rounded-xl text-xs sm:text-sm font-normal transition-all outline-none border ${
-              isDark 
-                ? "bg-[#11182c] border-[#1e2c4a] text-white placeholder-slate-400 focus:border-[#2563eb] focus:bg-[#141d35]" 
-                : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#2563eb] focus:bg-white"
-            }`}
+            placeholder="Search hotspots, sensors, facilities (e.g., Paradip, Dahej, Sentinel-2)..."
+            className="w-full pl-9 pr-4 py-2 rounded-xl text-xs sm:text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#2563eb] bg-[#10172a] border border-[#1e2c4a] text-slate-200 placeholder-slate-500"
           />
         </div>
       </div>
 
-      {/* Right side: Weather widget, AI mode pill, Theme toggle, Profile */}
-      <div className="flex items-center gap-3 sm:gap-4 pl-3">
-        {/* Weather indicator matching FireSight top-right */}
-        <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl border ${
-          isDark 
-            ? "bg-[#10172a] border-[#1e2c4a] text-slate-300" 
-            : "bg-slate-50 border-slate-200 text-slate-700"
-        }`}>
-          <CloudSun className="h-4 w-4 text-amber-400" />
-          <span className="text-xs font-medium">23°C Clear</span>
+      {/* Right side: Weather widget, AI mode pill, Profile */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Subtle Weather / Atmosphere Pill */}
+        <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-[#10172a] border-[#1e2c4a] text-slate-300">
+          <CloudSun className="h-3.5 w-3.5 text-amber-400" />
+          <span>Odisha: 31°C • Clear SWIR</span>
         </div>
 
-        {/* AI Model Mode selector (Cloud vs Local) */}
-        <div className={`hidden sm:flex items-center p-1 rounded-xl border ${
-          isDark ? "bg-[#10172a] border-[#1e2c4a]" : "bg-slate-100 border-slate-200"
-        }`}>
+        {/* AI Processing Mode Pill (Cloud Gemini vs Local Edge) */}
+        <div className="flex items-center p-0.5 rounded-xl border bg-[#10172a] border-[#1e2c4a]">
           <button
             onClick={() => setModelMode("cloud")}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
               modelMode === "cloud"
                 ? "bg-[#2563eb] text-white shadow-xs"
-                : isDark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                : "text-slate-400 hover:text-white"
             }`}
-            title="Google Gemini Cloud Inference"
+            title="Google Gemini Cloud Reasoning"
           >
             <Globe2 className="h-3 w-3" />
             <span>Cloud</span>
           </button>
-
           <button
             onClick={() => setModelMode("local")}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
               modelMode === "local"
                 ? "bg-[#2563eb] text-white shadow-xs"
-                : isDark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-slate-900"
+                : "text-slate-400 hover:text-white"
             }`}
             title="Local Edge ConvNeXt Inference"
           >
@@ -123,60 +98,36 @@ export default function Header({
           </button>
         </div>
 
-        {/* Theme Toggle (FireSight Dark vs FireSense Light) */}
-        <button
-          onClick={() => setTheme(isDark ? "light" : "dark")}
-          className={`p-2 rounded-xl border transition-all cursor-pointer hover:scale-105 active:scale-95 ${
-            isDark 
-              ? "bg-[#10172a] border-[#1e2c4a] text-amber-400 hover:bg-[#141d33]" 
-              : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-          }`}
-          title={isDark ? "Switch to FireSense Light" : "Switch to FireSight Dark"}
-          type="button"
-          aria-label="Toggle theme"
-        >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </button>
-
-        {/* Operator Profile Pill matching reference images */}
+        {/* Operator Profile Pill */}
         <div className="relative">
           <button
             onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            className={`flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border transition-all cursor-pointer ${
-              isDark 
-                ? "bg-[#10172a] border-[#1e2c4a] hover:border-[#2b3d63]" 
-                : "bg-slate-50 border-slate-200 hover:bg-slate-100"
-            }`}
+            className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border transition-all cursor-pointer bg-[#10172a] border-[#1e2c4a] hover:border-slate-600"
             type="button"
           >
-            <div className="relative">
-              <img
-                alt="Nancy Chan"
-                src={profilePic}
-                className="w-7 h-7 rounded-full object-cover"
-              />
-              <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#0b101d]" />
+            <img
+              src={profilePic}
+              alt="Archit Tripathi"
+              className="w-7 h-7 rounded-full object-cover border border-slate-700"
+            />
+            <div className="hidden sm:flex flex-col text-left">
+              <span className="text-xs font-semibold leading-tight text-slate-200">
+                Archit Tripathi
+              </span>
+              <span className="text-[10px] text-emerald-400 font-medium leading-none">
+                Chief Officer
+              </span>
             </div>
-            <span className={`text-xs font-medium hidden sm:inline ${
-              isDark ? "text-slate-200" : "text-slate-800"
-            }`}>
-              Team Nancy Chan
-            </span>
-            <ChevronDown className={`h-3.5 w-3.5 ${isDark ? "text-slate-400" : "text-slate-500"}`} />
+            <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
           </button>
 
-          {/* Profile Dropdown */}
+          {/* Profile Dropdown Menu */}
           {profileDropdownOpen && (
-            <div className={`absolute right-0 mt-2 w-52 rounded-xl border shadow-xl p-2 z-50 transition-all ${
-              isDark 
-                ? "bg-[#0f172a] border-[#1e2c4a] text-white" 
-                : "bg-white border-slate-200 text-slate-800"
-            }`}>
-              <div className="px-3 py-2 border-b border-slate-700/20">
-                <p className="text-xs font-semibold">Team Nancy Chan</p>
-                <p className={`text-[11px] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                  Emergency Operations Center
-                </p>
+            <div className="absolute right-0 mt-2 w-56 rounded-2xl shadow-xl border p-2 z-50 animate-in fade-in zoom-in-95 duration-100 bg-[#0f172a] border-[#1e2c4a] text-slate-200">
+              <div className="px-3 py-2 border-b border-[#1e2c4a]">
+                <p className="text-xs font-semibold text-white">Archit Tripathi</p>
+                <p className="text-[11px] text-slate-400">Chief Geospatial Officer</p>
+                <p className="text-[10px] text-slate-500 font-mono mt-0.5">ID: OP-TS-8492</p>
               </div>
 
               <div className="py-1">
@@ -185,23 +136,26 @@ export default function Header({
                     setActiveScreen("settings");
                     setProfileDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors cursor-pointer ${
-                    isDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
-                  }`}
+                  className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800"
                 >
                   System Preferences
                 </button>
                 <button
                   onClick={() => {
-                    setActiveScreen("audit-trail");
+                    setActiveScreen("system-health");
                     setProfileDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors cursor-pointer ${
-                    isDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
-                  }`}
+                  className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800"
                 >
-                  Audit Verification Logs
+                  Diagnostic Logs
                 </button>
+              </div>
+
+              <div className="pt-1 border-t border-[#1e2c4a]">
+                <div className="px-3 py-1 text-[10px] text-slate-500 flex items-center justify-between">
+                  <span>Thermo Shield AI</span>
+                  <span className="text-emerald-400 font-medium">v1.2.0 • Online</span>
+                </div>
               </div>
             </div>
           )}
