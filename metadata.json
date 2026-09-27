@@ -1,0 +1,6 @@
+{
+  "name": "Thermo-Shield AI",
+  "description": "NTRO Geospatial Intelligence Platform — Tactical Active Hotspot Tracking and AI-Powered Multi-Spectral Verification Triad",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

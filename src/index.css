@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* Unified Typography: Inter is the single font across the entire application */
+@layer base {
+  *, ::before, ::after {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* FireSight (Dark) & FireSense (Light) Color Utilities */
+:root {
+  --font-sans: 'Inter', sans-serif;
+}
+
+/* Tactical & Clean Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dark ::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #1f2e4d;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+/* Custom Selection Highlight */
+::selection {
+  background: rgba(37, 99, 235, 0.4);
+  color: #ffffff;
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Live Map Radar & Thermal Animations */
+@keyframes radarSweep {
+  0% { transform: translateY(-100%); opacity: 0; }
+  15% { opacity: 0.75; }
+  85% { opacity: 0.75; }
+  100% { transform: translateY(700px); opacity: 0; }
+}
+
+@keyframes thermalPulse {
+  0%, 100% { transform: scale(1); opacity: 0.65; }
+  50% { transform: scale(1.15); opacity: 0.95; }
+}
+
+@keyframes laserBracket {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)); opacity: 0.9; }
+  50% { filter: drop-shadow(0 0 16px rgba(255, 68, 68, 1)); opacity: 1; }
+}
+
+@keyframes heatDistort {
+  0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.5; }
+  50% { transform: translateY(-8px) scaleY(1.08); opacity: 0.8; }
+}
+
+.animate-radar-sweep {
+  animation: radarSweep 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-thermal-pulse {
+  animation: thermalPulse 2.2s ease-in-out infinite;
+}
+
+.animate-laser-bracket {
+  animation: laserBracket 1.6s ease-in-out infinite;
+}
+
+.animate-heat-distort {
+  animation: heatDistort 3s ease-in-out infinite;
+}
+
+
