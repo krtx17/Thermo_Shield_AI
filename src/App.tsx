@@ -396,6 +396,9 @@ export default function App() {
               setTheme={handleSetTheme}
               modelMode={modelMode}
               setModelMode={setModelMode}
+              currentUser={currentUser}
+              onOpenOnboarding={() => setIsOnboardingOpen(true)}
+              setActiveScreen={setActiveScreen}
             />
           )}
         </main>
