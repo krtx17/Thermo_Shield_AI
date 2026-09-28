@@ -63,11 +63,11 @@ export default function Sidebar({
               onClick={() => { setActiveScreen("home"); onClose(); }}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 p-0.5 border border-white/20 flex items-center justify-center shadow-md shadow-blue-900/20 group-hover:scale-105 transition-transform shrink-0">
+              <div className="w-9 h-9 rounded-xl overflow-hidden bg-[#070b14] border border-[#1e2c4a] flex items-center justify-center shadow-md shadow-blue-900/30 group-hover:scale-105 transition-transform shrink-0">
                 <img 
                   src="/app_icon.png" 
                   alt="Thermo Shield AI Icon" 
-                  className="w-full h-full object-contain rounded-lg"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex flex-col">

@@ -63,11 +63,13 @@ export default function Header({
           onClick={() => setActiveScreen("home")}
           className="flex items-center gap-2.5 cursor-pointer group select-none"
         >
-          <img 
-            src="/app_icon.png" 
-            alt="Thermo Shield AI" 
-            className="w-7 h-7 object-contain rounded-md group-hover:scale-105 transition-transform" 
-          />
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg overflow-hidden bg-[#070b14] border border-[#1e2c4a] flex items-center justify-center shadow-sm shadow-blue-900/30 group-hover:scale-105 transition-transform shrink-0">
+            <img 
+              src="/app_icon.png" 
+              alt="Thermo Shield AI" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
           <span className="text-sm font-bold tracking-tight text-white hidden sm:inline">
             Thermo Shield
           </span>
