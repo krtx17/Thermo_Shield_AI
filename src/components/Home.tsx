@@ -132,14 +132,14 @@ export default function Home({
             }}
           />
 
-          {/* Central 3D Originkit Globe Container - Cleanly Sized with Zero Overlaps */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center">
-            <div className="w-full h-full max-w-[850px] max-h-[640px] flex items-center justify-center">
+          {/* Central 3D Originkit Globe Container - Sized & Positioned for Zero Overlaps */}
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-auto">
+            <div className="w-full h-full max-w-[700px] max-h-[500px] flex items-center justify-center">
               <Globe
                 speed={1.6}
                 smoothing={8}
                 dots={memoizedDots}
-                scale={7.5}
+                scale={6.8}
                 oceanColor="#060b18"
                 outlineColor="#0ea5e9"
                 showOutline={true}
@@ -156,131 +156,104 @@ export default function Home({
           </div>
 
           {/* ===================================================================== */}
-          {/* UI CONTENT OVERLAY — ENGINEERED FOR ZERO OVERLAPS WITH GLOBE */}
+          {/* UI CONTENT — POSITIONED STRICTLY IN CORNERS WITH ZERO OVERLAP ON GLOBE */}
           {/* ===================================================================== */}
           
-          {/* Bottom Row: Left 3 Metric Cards + Center Hotspot Quick Select + Right Legend */}
-          <div className="relative z-30 px-6 sm:px-10 pb-6 flex flex-col sm:flex-row items-end justify-between gap-4 pointer-events-none">
-            
-            {/* Left 3 Floating Metric Cards */}
-            <div className="flex flex-col gap-2.5 w-full sm:w-64 pointer-events-auto">
-              
-              {/* Card 1: Satellites Monitored */}
-              <div className="p-3 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-[#38bdf8] shrink-0">
-                  <Radio className="h-4.5 w-4.5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-slate-400">
-                    Satellites Monitored
-                  </span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-base font-bold text-white">12</span>
-                    <span className="text-[10px] font-semibold text-emerald-400">↑ 2 active</span>
-                  </div>
-                </div>
+          {/* Bottom-Left: Compact Telemetry Metric Cards (Strictly in Corner, Clears Globe) */}
+          <div className="absolute bottom-6 left-6 z-20 hidden xl:flex flex-col gap-2 w-56 pointer-events-auto">
+            {/* Card 1: Satellites Monitored */}
+            <div className="p-2.5 px-3 rounded-xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-[#38bdf8] shrink-0">
+                <Radio className="h-4 w-4" />
               </div>
-
-              {/* Card 2: Regions Scanned */}
-              <div className="p-3 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
-                  <MapPin className="h-4.5 w-4.5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-slate-400">
-                    Regions Scanned
-                  </span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-base font-bold text-white">245</span>
-                    <span className="text-[10px] font-semibold text-emerald-400">↑ 12%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 3: Potential Fire Detections */}
-              <div className="p-3 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
-                  <Flame className="h-4.5 w-4.5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold text-slate-400">
-                    Potential Fire Detections
-                  </span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-base font-bold text-white">3</span>
-                    <span className="text-[10px] font-semibold text-rose-400">↑ 2 critical</span>
-                  </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-slate-400">
+                  Satellites Monitored
+                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-sm font-bold text-white">12</span>
+                  <span className="text-[10px] font-semibold text-emerald-400">↑ 2 active</span>
                 </div>
               </div>
             </div>
 
-            {/* Center Quick Hotspot Jump Buttons */}
-            <div className="hidden lg:flex items-center gap-2 p-1.5 rounded-2xl bg-[#0b101d]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg pointer-events-auto">
-              <span className="text-[10px] font-bold text-slate-400 px-2 uppercase tracking-wider">
-                Focus Target:
-              </span>
-              {hotspots.slice(0, 3).map((h) => (
-                <button
-                  key={h.id}
-                  onClick={() => handleViewDetails(h)}
-                  className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                    h.severity === "CRITICAL"
-                      ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30"
-                      : "bg-[#141d33] text-slate-300 border border-[#1e2c4a] hover:bg-[#1a2642]"
-                  }`}
-                >
-                  <span className={`w-2 h-2 rounded-full ${h.severity === "CRITICAL" ? "bg-rose-500 animate-ping" : "bg-amber-400"}`} />
-                  <span>{h.name.split(" ")[0]}</span>
-                </button>
-              ))}
+            {/* Card 2: Regions Scanned */}
+            <div className="p-2.5 px-3 rounded-xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                <MapPin className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-slate-400">
+                  Regions Scanned
+                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-sm font-bold text-white">245</span>
+                  <span className="text-[10px] font-semibold text-emerald-400">↑ 12%</span>
+                </div>
+              </div>
             </div>
 
-            {/* Bottom-Right Section: Active Alerts (Positioned Down) + Legend Card */}
-            <div className="flex flex-col gap-2.5 items-end pointer-events-auto">
-              {/* Active Alerts Pill Card - Positioned More Down */}
-              <div 
-                onClick={() => setActiveScreen("active-investigations")}
-                className="w-full sm:w-auto p-3 px-4 rounded-2xl bg-[#0f172a]/95 hover:bg-[#141f38] border border-rose-500/40 backdrop-blur-md shadow-xl flex items-center gap-3.5 transition-all hover:scale-102 cursor-pointer pointer-events-auto shrink-0"
-              >
-                <div className="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0">
-                  <Flame className="h-4.5 w-4.5 fill-rose-500" />
+            {/* Card 3: Potential Fire Detections */}
+            <div className="p-2.5 px-3 rounded-xl bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] backdrop-blur-md shadow-lg flex items-center gap-3 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                <Flame className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-slate-400">
+                  Potential Fire Detections
+                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-sm font-bold text-white">3</span>
+                  <span className="text-[10px] font-semibold text-rose-400">↑ 2 critical</span>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div className="flex flex-col text-left">
-                  <span className="text-[10px] font-semibold text-slate-400 leading-none">
-                    Active Alerts
+          {/* Bottom-Right: Active Alerts Pill (Anchored Down) + Spectral Legend */}
+          <div className="absolute bottom-6 right-6 z-20 flex flex-col gap-2 items-end pointer-events-auto">
+            {/* Active Alerts Pill Card - Positioned in the Corner */}
+            <div 
+              onClick={() => setActiveScreen("active-investigations")}
+              className="w-full sm:w-auto p-2.5 px-3.5 rounded-xl bg-[#0f172a]/95 hover:bg-[#141f38] border border-rose-500/40 backdrop-blur-md shadow-xl flex items-center gap-3 transition-all hover:scale-102 cursor-pointer pointer-events-auto shrink-0"
+            >
+              <div className="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0">
+                <Flame className="h-4 w-4 fill-rose-500" />
+              </div>
+
+              <div className="flex flex-col text-left">
+                <span className="text-[10px] font-semibold text-slate-400 leading-none">
+                  Active Alerts
+                </span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-base font-bold text-white leading-none">
+                    3
                   </span>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-lg font-bold text-white leading-none">
-                      3
-                    </span>
-                    <span className="text-[10px] font-medium text-rose-400 flex items-center gap-0.5">
-                      +2 since last hour <ChevronRight className="h-3 w-3" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom-Right Legend Card */}
-              <div className="hidden sm:flex flex-col gap-2 p-3 rounded-2xl bg-[#0f172a]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg text-xs pointer-events-auto">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
-                  Spectral Classification
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
-                  <span className="text-slate-200 font-medium text-[11px]">Active Fire (VIIRS FRP &gt; 150MW)</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
-                  <span className="text-slate-200 font-medium text-[11px]">Thermal Anomaly (SWIR Alert)</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-                  <span className="text-slate-200 font-medium text-[11px]">Monitored Enclave (Sentinel-2)</span>
+                  <span className="text-[10px] font-medium text-rose-400 flex items-center gap-0.5">
+                    +2 since last hour <ChevronRight className="h-3 w-3" />
+                  </span>
                 </div>
               </div>
             </div>
 
+            {/* Bottom-Right Compact Legend Card */}
+            <div className="hidden sm:flex flex-col gap-1.5 p-2.5 px-3 rounded-xl bg-[#0f172a]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg text-xs pointer-events-auto">
+              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                Spectral Classification
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
+                <span className="text-slate-300 font-medium text-[10px]">Active Fire (VIIRS FRP &gt; 150MW)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+                <span className="text-slate-300 font-medium text-[10px]">Thermal Anomaly (SWIR Alert)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
+                <span className="text-slate-300 font-medium text-[10px]">Monitored Enclave (Sentinel-2)</span>
+              </div>
+            </div>
           </div>
 
         </div>
