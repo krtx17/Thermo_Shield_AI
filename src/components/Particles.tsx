@@ -125,10 +125,15 @@ export default function Particles({
     const container = containerRef.current;
     if (!container) return;
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const isTablet = typeof window !== "undefined" && window.innerWidth < 1024;
+    const count = isMobile ? Math.min(25, particleCount) : isTablet ? Math.min(45, particleCount) : Math.min(80, particleCount);
+
     const renderer = new Renderer({
-      dpr: pixelRatio,
+      dpr: isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 1.25),
       depth: false,
       alpha: true,
+      powerPreference: "low-power"
     });
     const gl = renderer.gl;
     container.appendChild(gl.canvas);
@@ -154,11 +159,10 @@ export default function Particles({
       mouseRef.current = { x, y };
     };
 
-    if (moveParticlesOnHover) {
+    if (moveParticlesOnHover && !isMobile) {
       window.addEventListener("mousemove", handleMouseMove);
     }
 
-    const count = particleCount;
     const positions = new Float32Array(count * 3);
     const randoms = new Float32Array(count * 4);
     const colors = new Float32Array(count * 3);
@@ -195,7 +199,7 @@ export default function Particles({
       uniforms: {
         uTime: { value: 0 },
         uSpread: { value: particleSpread },
-        uBaseSize: { value: particleBaseSize * pixelRatio },
+        uBaseSize: { value: particleBaseSize * (isMobile ? 1.0 : pixelRatio) },
         uSizeRandomness: { value: sizeRandomness },
         uAlphaParticles: { value: alphaParticles ? 1 : 0 },
       },
@@ -207,17 +211,29 @@ export default function Particles({
 
     let animationFrameId: number;
     let lastTime = performance.now();
+    let lastRenderTime = 0;
     let elapsed = 0;
+    let isVisible = !document.hidden;
+
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     const update = (t: number) => {
       animationFrameId = requestAnimationFrame(update);
+      if (!isVisible) return;
+      // Frame throttle: Cap ambient particle field to ~40fps to avoid burning GPU
+      if (t - lastRenderTime < 24) return;
+      lastRenderTime = t;
+
       const delta = t - lastTime;
       lastTime = t;
       elapsed += delta * speed;
 
       program.uniforms.uTime.value = elapsed * 0.001;
 
-      if (moveParticlesOnHover) {
+      if (moveParticlesOnHover && !isMobile) {
         particles.position.x = -mouseRef.current.x * particleHoverFactor;
         particles.position.y = -mouseRef.current.y * particleHoverFactor;
       } else {
@@ -238,6 +254,7 @@ export default function Particles({
 
     return () => {
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       if (moveParticlesOnHover) {
         window.removeEventListener("mousemove", handleMouseMove);
       }

@@ -7,6 +7,9 @@ import {
     WebGLRenderer,
     SphereGeometry,
     MeshBasicMaterial,
+    LineBasicMaterial,
+    LineLoop,
+    BufferGeometry,
     Color,
     Mesh,
     Group,
@@ -14,8 +17,6 @@ import {
     Matrix4,
     Raycaster,
     Vector2,
-    TubeGeometry,
-    CatmullRomCurve3,
     Vector3,
     CanvasTexture,
 } from "three";
@@ -288,9 +289,10 @@ export default function Globe({
         camera.position.set(0, 0, cameraDistance);
         camera.lookAt(0, 0, 0);
 
-        const renderer = new WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         renderer.setSize(containerWidth, containerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const isMobileOrTablet = typeof window !== "undefined" && window.innerWidth < 1024;
+        renderer.setPixelRatio(isMobileOrTablet ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
         renderer.outputColorSpace = "srgb";
         const canvas = renderer.domElement;
         canvas.style.position = "absolute";
@@ -328,48 +330,29 @@ export default function Globe({
         const oceanMesh = new Mesh(oceanGeometry, oceanMaterial);
         scene.add(oceanMesh);
 
-        let globeOutlineMesh: Mesh | null = null;
+        let globeOutlineMesh: LineLoop | null = null;
         if (showOutline && outlineColor && outlineRgba.a > 0) {
-            const outlinePositions: number[] = [];
-            const segments = 128;
+            const outlinePositions: Vector3[] = [];
+            const segments = 64;
             for (let i = 0; i <= segments; i++) {
                 const angle = (i / segments) * Math.PI * 2;
-                const x = Math.cos(angle) * globeRadius;
-                const y = Math.sin(angle) * globeRadius;
-                const z = 0;
-                outlinePositions.push(x, y, z);
-            }
-            const outlinePoints: Vector3[] = [];
-            for (let i = 0; i < outlinePositions.length; i += 3) {
-                outlinePoints.push(
+                outlinePositions.push(
                     new Vector3(
-                        outlinePositions[i],
-                        outlinePositions[i + 1],
-                        outlinePositions[i + 2]
+                        Math.cos(angle) * globeRadius,
+                        Math.sin(angle) * globeRadius,
+                        0
                     )
                 );
             }
-            if (outlinePoints.length >= 2) {
-                outlinePoints.push(outlinePoints[0].clone());
-                const outlineColorObj = new Color(resolvedOutlineColor);
-                const outlineMaterial = new MeshBasicMaterial({
-                    color: outlineColorObj,
-                    transparent: outlineRgba.a < 1,
-                    opacity: outlineRgba.a,
-                });
-                const curve = new CatmullRomCurve3(outlinePoints);
-                const radius = (outlineWidth / 10) * 0.01;
-                const tubeGeometry = new TubeGeometry(
-                    curve,
-                    outlinePoints.length * 2,
-                    radius,
-                    8,
-                    false
-                );
-                globeOutlineMesh = new Mesh(tubeGeometry, outlineMaterial);
-            }
+            const outlineGeo = new BufferGeometry().setFromPoints(outlinePositions);
+            const outlineMat = new LineBasicMaterial({
+                color: new Color(resolvedOutlineColor),
+                transparent: outlineRgba.a < 1,
+                opacity: outlineRgba.a,
+            });
+            globeOutlineMesh = new LineLoop(outlineGeo, outlineMat);
+            scene.add(globeOutlineMesh);
         }
-        void globeOutlineMesh;
 
         const continentOutlineGroup = new Group();
 
@@ -378,94 +361,52 @@ export default function Globe({
             const graticuleColorObj = resolvedGraticuleColor
                 ? new Color(resolvedGraticuleColor)
                 : new Color(1, 1, 1);
-            const graticuleMaterial = new MeshBasicMaterial({
+            const graticuleMaterial = new LineBasicMaterial({
                 color: graticuleColorObj,
                 transparent: graticuleRgba.a < 1 || graticuleRgba.a === 0,
-                opacity: graticuleRgba.a,
+                opacity: graticuleRgba.a * 0.7,
             });
-            const gridSpacing = 15;
-            for (let lat = -90; lat <= 90; lat += gridSpacing) {
-                const positions: number[] = [];
-                const segments = 64;
+            const gridSpacing = 20; // 20-deg spacing is lighter and crisper
+            for (let lat = -80; lat <= 80; lat += gridSpacing) {
+                const points: Vector3[] = [];
+                const segments = 48;
                 for (let i = 0; i <= segments; i++) {
                     const lng = (i / segments) * 360 - 180;
                     const pos = latLngToPosition(lat, lng);
-                    positions.push(
-                        pos.x * globeRadius,
-                        pos.y * globeRadius,
-                        pos.z * globeRadius
+                    points.push(
+                        new Vector3(
+                            pos.x * globeRadius,
+                            pos.y * globeRadius,
+                            pos.z * globeRadius
+                        )
                     );
                 }
-                if (positions && positions.length >= 6) {
-                    const points: Vector3[] = [];
-                    for (let i = 0; i < positions.length; i += 3) {
-                        points.push(
-                            new Vector3(
-                                positions[i],
-                                positions[i + 1],
-                                positions[i + 2]
-                            )
-                        );
-                    }
-                    if (points.length >= 2) {
-                        const curve = new CatmullRomCurve3(points);
-                        const radius = (gridWidth / 10) * 0.01;
-                        const tubeGeometry = new TubeGeometry(
-                            curve,
-                            points.length * 2,
-                            radius,
-                            8,
-                            false
-                        );
-                        const tubeMesh = new Mesh(
-                            tubeGeometry,
-                            graticuleMaterial
-                        );
-                        tubeMesh.renderOrder = 0;
-                        graticuleGroup.add(tubeMesh);
-                    }
+                if (points.length >= 2) {
+                    const lineGeo = new BufferGeometry().setFromPoints(points);
+                    const lineMesh = new LineLoop(lineGeo, graticuleMaterial);
+                    lineMesh.renderOrder = 0;
+                    graticuleGroup.add(lineMesh);
                 }
             }
             for (let lng = -180; lng < 180; lng += gridSpacing) {
-                const positions: number[] = [];
-                const segments = 64;
+                const points: Vector3[] = [];
+                const segments = 48;
                 for (let i = 0; i <= segments; i++) {
                     const lat = (i / segments) * 180 - 90;
                     const pos = latLngToPosition(lat, lng);
-                    positions.push(
-                        pos.x * globeRadius,
-                        pos.y * globeRadius,
-                        pos.z * globeRadius
+                    points.push(
+                        new Vector3(
+                            pos.x * globeRadius,
+                            pos.y * globeRadius,
+                            pos.z * globeRadius
+                        )
                     );
                 }
-                if (positions && positions.length >= 6) {
-                    const points: Vector3[] = [];
-                    for (let i = 0; i < positions.length; i += 3) {
-                        points.push(
-                            new Vector3(
-                                positions[i],
-                                positions[i + 1],
-                                positions[i + 2]
-                            )
-                        );
-                    }
-                    if (points.length >= 2) {
-                        const curve = new CatmullRomCurve3(points);
-                        const radius = (gridWidth / 10) * 0.01;
-                        const tubeGeometry = new TubeGeometry(
-                            curve,
-                            points.length * 2,
-                            radius,
-                            8,
-                            false
-                        );
-                        const tubeMesh = new Mesh(
-                            tubeGeometry,
-                            graticuleMaterial
-                        );
-                        tubeMesh.renderOrder = 0;
-                        graticuleGroup.add(tubeMesh);
-                    }
+                if (points.length >= 2) {
+                    const lineGeo = new BufferGeometry().setFromPoints(points);
+                    const lineMesh = new LineLoop(lineGeo, graticuleMaterial);
+                    lineMesh.renderOrder = 0;
+                    graticuleGroup.add(lineMesh);
                 }
             }
         }
@@ -486,12 +427,12 @@ export default function Globe({
                 }
                 if (showOutline && outlineColor && outlineRgba.a > 0) {
                     const outlineColorObj = new Color(resolvedOutlineColor);
-                    const outlineMaterial = new MeshBasicMaterial({
+                    const outlineMaterial = new LineBasicMaterial({
                         color: outlineColorObj,
                         transparent: outlineRgba.a < 1,
                         opacity: outlineRgba.a,
                         depthTest: true,
-                        depthWrite: true,
+                        depthWrite: false,
                     });
                     const projection = geoEquirectangular();
                     const pathGenerator = geoPath().projection(projection);
@@ -556,21 +497,13 @@ export default function Globe({
                                     points.push(points[0].clone());
                                 }
                                 if (points.length >= 2) {
-                                    const curve = new CatmullRomCurve3(points);
-                                    const radius = (outlineWidth / 10) * 0.01;
-                                    const tubeGeometry = new TubeGeometry(
-                                        curve,
-                                        points.length * 2,
-                                        radius,
-                                        8,
-                                        false
-                                    );
-                                    const tubeMesh = new Mesh(
-                                        tubeGeometry,
+                                    const lineGeo = new BufferGeometry().setFromPoints(points);
+                                    const lineMesh = new LineLoop(
+                                        lineGeo,
                                         outlineMaterial
                                     );
-                                    tubeMesh.renderOrder = 0;
-                                    continentOutlineGroup.add(tubeMesh);
+                                    lineMesh.renderOrder = 0;
+                                    continentOutlineGroup.add(lineMesh);
                                 }
                             }
                         };
@@ -808,8 +741,21 @@ export default function Globe({
         globeGroup.add(continentOutlineGroup);
         markerMeshes.forEach((mesh) => globeGroup.add(mesh));
 
+        let isTabVisible = !document.hidden;
+        const handleVisibilityChange = () => {
+            isTabVisible = !document.hidden;
+            if (isTabVisible && rotationSpeed !== 0) {
+                startAnimation();
+            }
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
         const animate = () => {
             if (isDestroyed) return;
+            if (!isTabVisible || container.clientWidth === 0 || container.clientHeight === 0) {
+                animationFrameId = null;
+                return;
+            }
             let needsRender = false;
             const threshold = 0.01;
             if (
@@ -913,6 +859,39 @@ export default function Globe({
         };
         canvas.addEventListener("mousedown", handleMouseDown);
 
+        // Mobile & Tablet Touch Support
+        const handleTouchStart = (event: TouchEvent) => {
+            if (event.touches.length !== 1) return;
+            isDragging = true;
+            velocity.x = 0;
+            velocity.y = 0;
+            lastMouseX = event.touches[0].clientX;
+            lastMouseY = event.touches[0].clientY;
+            startAnimation();
+        };
+        const handleTouchMove = (event: TouchEvent) => {
+            if (!isDragging || event.touches.length !== 1) return;
+            const sensitivity = mapDragSpeedUiToSensitivity(dragSpeed) * 1.5;
+            const dx = event.touches[0].clientX - lastMouseX;
+            const dy = event.touches[0].clientY - lastMouseY;
+            targetRotation.x += dx * sensitivity;
+            targetRotation.y += dy * sensitivity;
+            targetRotation.y = Math.max(
+                -Math.PI / 2,
+                Math.min(Math.PI / 2, targetRotation.y)
+            );
+            velocity.x = dx * sensitivity * 0.3;
+            velocity.y = dy * sensitivity * 0.3;
+            lastMouseX = event.touches[0].clientX;
+            lastMouseY = event.touches[0].clientY;
+        };
+        const handleTouchEnd = () => {
+            isDragging = false;
+        };
+        canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
+        window.addEventListener("touchmove", handleTouchMove, { passive: true });
+        window.addEventListener("touchend", handleTouchEnd, { passive: true });
+
         const raycaster = new Raycaster();
         const mouse = new Vector2();
         const handleMouseMove = (event: MouseEvent) => {
@@ -947,8 +926,12 @@ export default function Globe({
             isDestroyed = true;
             if (animationFrameId !== null)
                 cancelAnimationFrame(animationFrameId);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
             canvas.removeEventListener("mousedown", handleMouseDown);
             canvas.removeEventListener("mousemove", handleMouseMove);
+            canvas.removeEventListener("touchstart", handleTouchStart);
+            window.removeEventListener("touchmove", handleTouchMove);
+            window.removeEventListener("touchend", handleTouchEnd);
             resizeObserver.disconnect();
             renderer.dispose();
             if (canvas.parentNode === container) {

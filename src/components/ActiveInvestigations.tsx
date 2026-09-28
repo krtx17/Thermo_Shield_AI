@@ -225,12 +225,12 @@ ${selectedHotspot.recommendation}
       </div>
 
       {/* Main Layout: Left Satellite View + Right Incident Details Panel */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         
         {/* ========================================================================= */}
         {/* LEFT VIEWPORT: SATELLITE HEAT MAP & IMAGERY SELECTOR */}
         {/* ========================================================================= */}
-        <div className="relative flex-1 h-[55vh] lg:h-full bg-[#070b14] overflow-hidden flex flex-col justify-between p-4 sm:p-6 select-none">
+        <div className="relative flex-1 h-[42vh] sm:h-[48vh] lg:h-full min-h-[300px] shrink-0 lg:shrink bg-[#070b14] overflow-hidden flex flex-col justify-between p-4 sm:p-6 select-none">
           
           {/* Main Satellite Heat Map Canvas */}
           <div className="relative flex-1 w-full rounded-2xl overflow-hidden border border-[#1a2742] bg-[#090e1a] flex items-center justify-center">

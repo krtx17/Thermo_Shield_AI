@@ -209,9 +209,9 @@ export default function CommandCenter({
       >
         
         {/* Top Floating Controls Bar */}
-        <div className="absolute top-4 left-4 z-30 flex items-center gap-2 pointer-events-auto">
+        <div className="absolute top-4 left-4 z-30 flex items-center gap-2 pointer-events-auto max-w-[calc(100vw-90px)] sm:max-w-none overflow-x-auto no-scrollbar">
           {/* Layer toggles */}
-          <div className="p-1 rounded-xl bg-[#0b101d]/90 border border-[#1e2c4a] backdrop-blur-md flex items-center gap-1 shadow-lg">
+          <div className="p-1 rounded-xl bg-[#0b101d]/90 border border-[#1e2c4a] backdrop-blur-md flex items-center gap-1 shadow-lg shrink-0">
             {["Thermal", "AI Reticle", "Radar Scan", "Telemetry"].map((layer) => {
               const active = activeOverlays.includes(layer);
               return (

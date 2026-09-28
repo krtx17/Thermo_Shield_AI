@@ -134,12 +134,12 @@ export default function Home({
 
           {/* Central 3D Originkit Globe Container - Sized & Positioned for Zero Overlaps */}
           <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-auto">
-            <div className="w-full h-full max-w-[700px] max-h-[500px] flex items-center justify-center">
+            <div className="w-full h-full max-w-[90vw] sm:max-w-[700px] max-h-[480px] flex items-center justify-center">
               <Globe
                 speed={1.6}
                 smoothing={8}
                 dots={memoizedDots}
-                scale={6.8}
+                scale={typeof window !== "undefined" && window.innerWidth < 640 ? 5.2 : typeof window !== "undefined" && window.innerWidth < 1024 ? 6.0 : 6.8}
                 oceanColor="#060b18"
                 outlineColor="#0ea5e9"
                 showOutline={true}
@@ -160,11 +160,11 @@ export default function Home({
           {/* ===================================================================== */}
           
           {/* Top-Left: Project Mission & AI Intelligence Header (Strictly in Corner, Clears Globe) */}
-          <div className="absolute top-6 left-6 z-20 max-w-xs sm:max-w-sm pointer-events-auto">
-            <h1 className="text-base sm:text-xl font-extrabold tracking-tight leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 max-w-[260px] sm:max-w-sm pointer-events-auto">
+            <h1 className="text-sm sm:text-xl font-extrabold tracking-tight leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
               AI-Powered Detection<br />for a Safer Tomorrow
             </h1>
-            <p className="mt-1.5 text-xs font-normal leading-relaxed text-slate-300 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+            <p className="mt-1 text-[11px] sm:text-xs font-normal leading-relaxed text-slate-300 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] line-clamp-2 sm:line-clamp-none">
               Autonomous multispectral surveillance and thermal intelligence monitoring industrial fires across defense corridors and critical complexes.
             </p>
           </div>
@@ -221,7 +221,7 @@ export default function Home({
           </div>
 
           {/* Bottom-Right: Active Alerts Pill (Anchored Down) + Spectral Legend */}
-          <div className="absolute bottom-6 right-6 z-20 flex flex-col gap-2 items-end pointer-events-auto">
+          <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-20 flex flex-col gap-2 items-end pointer-events-auto">
             {/* Active Alerts Pill Card - Positioned in the Corner */}
             <div 
               onClick={() => setActiveScreen("active-investigations")}
