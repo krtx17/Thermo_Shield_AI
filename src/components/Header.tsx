@@ -10,7 +10,7 @@ import {
   Check
 } from "lucide-react";
 // @ts-ignore
-import profilePic from "../assets/images/archit_profile_1788707836364.jpg";
+import profilePic from "../assets/images/kritika_profile.jpg";
 
 interface HeaderProps {
   activeScreen?: ActiveScreen;
@@ -107,12 +107,12 @@ export default function Header({
           >
             <img
               src={profilePic}
-              alt="Archit Tripathi"
+              alt="Kritika Tripathi"
               className="w-7 h-7 rounded-full object-cover border border-slate-700"
             />
             <div className="hidden sm:flex flex-col text-left">
               <span className="text-xs font-semibold leading-tight text-slate-200">
-                Archit Tripathi
+                Kritika Tripathi
               </span>
               <span className="text-[10px] text-emerald-400 font-medium leading-none">
                 Chief Officer
@@ -125,7 +125,7 @@ export default function Header({
           {profileDropdownOpen && (
             <div className="absolute right-0 mt-2 w-56 rounded-2xl shadow-xl border p-2 z-50 animate-in fade-in zoom-in-95 duration-100 bg-[#0f172a] border-[#1e2c4a] text-slate-200">
               <div className="px-3 py-2 border-b border-[#1e2c4a]">
-                <p className="text-xs font-semibold text-white">Archit Tripathi</p>
+                <p className="text-xs font-semibold text-white">Kritika Tripathi</p>
                 <p className="text-[11px] text-slate-400">Chief Geospatial Officer</p>
                 <p className="text-[10px] text-slate-500 font-mono mt-0.5">ID: OP-TS-8492</p>
               </div>

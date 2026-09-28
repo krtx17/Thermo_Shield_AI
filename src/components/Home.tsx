@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Hotspot, ActiveScreen } from "../types";
 import Globe from "./originkit/ui/globe";
 import { 
@@ -96,40 +96,27 @@ export default function Home({
     setActiveScreen("active-investigations");
   };
 
-  // Convert hotspots to 3D globe coordinates
-  const hotspotMarkers = hotspots.map((h) => parseCoordinates(h.coordinates));
+  // Convert hotspots to 3D globe coordinates (memoized to avoid re-renders)
+  const hotspotMarkers = useMemo(
+    () => hotspots.map((h) => parseCoordinates(h.coordinates)),
+    [hotspots]
+  );
+
+  const memoizedDots = useMemo(() => ({
+    color: "#38bdf8",
+    size: 4,
+    density: 8,
+    allDots: false
+  }), []);
+
+  const memoizedMarkerConfig = useMemo(() => ({
+    markers: hotspotMarkers,
+    color: "#f43f5e",
+    size: 45
+  }), [hotspotMarkers]);
 
   return (
     <div className="relative w-full h-[calc(100vh-64px)] overflow-hidden flex flex-col select-none bg-transparent text-white">
-      
-      {/* Top Floating View Switcher (3D Earth Globe vs Industrial Aerial) */}
-      <div className="absolute top-4 left-6 z-40 flex items-center gap-2">
-        <div className="p-1 rounded-xl border backdrop-blur-md flex items-center gap-1 shadow-lg bg-[#0b101d]/90 border-[#1c2944] text-slate-300">
-          <button
-            onClick={() => setViewMode("globe")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-              viewMode === "globe"
-                ? "bg-[#2563eb] text-white shadow-md shadow-blue-600/30"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>3D Earth Sphere</span>
-          </button>
-
-          <button
-            onClick={() => setViewMode("aerial")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-              viewMode === "aerial"
-                ? "bg-[#2563eb] text-white shadow-md shadow-blue-600/30"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            <Layers className="h-3.5 w-3.5" />
-            <span>Industrial Aerial</span>
-          </button>
-        </div>
-      </div>
 
       {/* ========================================================================= */}
       {/* VIEW 1: ORIGINKIT 3D INTERACTIVE GLOBE WITH UNIFIED DARK THEME */}
@@ -151,12 +138,7 @@ export default function Home({
               <Globe
                 speed={1.6}
                 smoothing={8}
-                dots={{
-                  color: "#38bdf8",
-                  size: 4,
-                  density: 8,
-                  allDots: false
-                }}
+                dots={memoizedDots}
                 scale={7.5}
                 oceanColor="#060b18"
                 outlineColor="#0ea5e9"
@@ -168,11 +150,7 @@ export default function Home({
                 stopOnHover={true}
                 initialLatitude={22}
                 initialLongitude={79}
-                markerConfig={{
-                  markers: hotspotMarkers,
-                  color: "#f43f5e",
-                  size: 45
-                }}
+                markerConfig={memoizedMarkerConfig}
               />
             </div>
           </div>
@@ -181,49 +159,6 @@ export default function Home({
           {/* UI CONTENT OVERLAY — ENGINEERED FOR ZERO OVERLAPS WITH GLOBE */}
           {/* ===================================================================== */}
           
-          {/* Top Row: Left Header Titles + Right Active Alerts Pill */}
-          <div className="relative z-30 px-6 sm:px-10 pt-16 flex items-start justify-between gap-4 pointer-events-none">
-            
-            {/* Main Heading & Subtitle */}
-            <div className="max-w-xs pointer-events-auto">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-blue-500/10 border border-blue-500/20 text-[#38bdf8] mb-2 shadow-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                Orbital Defense Grid
-              </div>
-              <h1 className="text-lg sm:text-xl font-extrabold tracking-tight leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-                AI-Powered Detection<br />for a Safer Tomorrow
-              </h1>
-              <p className="mt-1.5 text-xs font-normal leading-relaxed text-slate-300 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
-                Autonomous multispectral surveillance for defense corridors and hazardous petrochemical complexes.
-              </p>
-            </div>
-
-            {/* Top-Right Active Alerts Pill Card */}
-            <div 
-              onClick={() => setActiveScreen("active-investigations")}
-              className="mt-1 p-3.5 px-4 rounded-2xl bg-[#0f172a]/90 hover:bg-[#141f38] border border-[#1e2c4a] backdrop-blur-md shadow-xl flex items-center gap-3.5 transition-all hover:scale-102 cursor-pointer pointer-events-auto shrink-0"
-            >
-              <div className="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0">
-                <Flame className="h-5 w-5 fill-rose-500" />
-              </div>
-
-              <div className="flex flex-col text-left">
-                <span className="text-[11px] font-semibold text-slate-400 leading-none">
-                  Active Alerts
-                </span>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xl font-bold text-white leading-none">
-                    3
-                  </span>
-                  <span className="text-[11px] font-medium text-rose-400 flex items-center gap-0.5">
-                    +2 since last hour <ChevronRight className="h-3 w-3" />
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
           {/* Bottom Row: Left 3 Metric Cards + Center Hotspot Quick Select + Right Legend */}
           <div className="relative z-30 px-6 sm:px-10 pb-6 flex flex-col sm:flex-row items-end justify-between gap-4 pointer-events-none">
             
@@ -300,22 +235,49 @@ export default function Home({
               ))}
             </div>
 
-            {/* Bottom-Right Legend Card */}
-            <div className="hidden sm:flex flex-col gap-2 p-3.5 rounded-2xl bg-[#0f172a]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg text-xs pointer-events-auto">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
-                Spectral Classification
+            {/* Bottom-Right Section: Active Alerts (Positioned Down) + Legend Card */}
+            <div className="flex flex-col gap-2.5 items-end pointer-events-auto">
+              {/* Active Alerts Pill Card - Positioned More Down */}
+              <div 
+                onClick={() => setActiveScreen("active-investigations")}
+                className="w-full sm:w-auto p-3 px-4 rounded-2xl bg-[#0f172a]/95 hover:bg-[#141f38] border border-rose-500/40 backdrop-blur-md shadow-xl flex items-center gap-3.5 transition-all hover:scale-102 cursor-pointer pointer-events-auto shrink-0"
+              >
+                <div className="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 shrink-0">
+                  <Flame className="h-4.5 w-4.5 fill-rose-500" />
+                </div>
+
+                <div className="flex flex-col text-left">
+                  <span className="text-[10px] font-semibold text-slate-400 leading-none">
+                    Active Alerts
+                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-lg font-bold text-white leading-none">
+                      3
+                    </span>
+                    <span className="text-[10px] font-medium text-rose-400 flex items-center gap-0.5">
+                      +2 since last hour <ChevronRight className="h-3 w-3" />
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
-                <span className="text-slate-200 font-medium text-[11px]">Active Fire (VIIRS FRP &gt; 150MW)</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
-                <span className="text-slate-200 font-medium text-[11px]">Thermal Anomaly (SWIR Alert)</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-                <span className="text-slate-200 font-medium text-[11px]">Monitored Enclave (Sentinel-2)</span>
+
+              {/* Bottom-Right Legend Card */}
+              <div className="hidden sm:flex flex-col gap-2 p-3 rounded-2xl bg-[#0f172a]/90 border border-[#1e2c4a] backdrop-blur-md shadow-lg text-xs pointer-events-auto">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                  Spectral Classification
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
+                  <span className="text-slate-200 font-medium text-[11px]">Active Fire (VIIRS FRP &gt; 150MW)</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                  <span className="text-slate-200 font-medium text-[11px]">Thermal Anomaly (SWIR Alert)</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                  <span className="text-slate-200 font-medium text-[11px]">Monitored Enclave (Sentinel-2)</span>
+                </div>
               </div>
             </div>
 
@@ -426,8 +388,8 @@ export default function Home({
             </div>
           </div>
 
-          {/* Floating Detected Fire Card in Aerial Mode */}
-          <div className="absolute top-6 right-6 z-20 w-72 sm:w-80">
+          {/* Floating Detected Fire Card in Aerial Mode - Positioned Down */}
+          <div className="absolute top-20 right-6 z-20 w-72 sm:w-80">
             <div className="p-4 rounded-2xl bg-[#0f172a]/90 border border-[#1c2944] backdrop-blur-md shadow-xl text-white">
               <div className="flex items-start gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-600 to-rose-700 overflow-hidden shrink-0 flex items-center justify-center shadow-md">

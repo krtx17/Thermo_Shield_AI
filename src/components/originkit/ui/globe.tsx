@@ -190,6 +190,38 @@ interface GlobeProps {
     style?: CSSProperties;
 }
 
+let globalLandFeaturesCache: any = null;
+let globalLandFeaturesPromise: Promise<any> | null = null;
+
+async function getLandFeatures(): Promise<any> {
+    if (globalLandFeaturesCache) return globalLandFeaturesCache;
+    if (globalLandFeaturesPromise) return globalLandFeaturesPromise;
+
+    globalLandFeaturesPromise = (async () => {
+        try {
+            // First load local static file (fast 0-latency)
+            const localRes = await fetch("/ne_50m_land.json");
+            if (localRes.ok) {
+                const data = await localRes.json();
+                globalLandFeaturesCache = data;
+                return data;
+            }
+        } catch {
+            // Fallback
+        }
+
+        const remoteRes = await fetch(
+            "https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/50m/physical/ne_50m_land.json"
+        );
+        if (!remoteRes.ok) throw new Error("Failed to load land data");
+        const data = await remoteRes.json();
+        globalLandFeaturesCache = data;
+        return data;
+    })();
+
+    return globalLandFeaturesPromise;
+}
+
 export default function Globe({
     speed = 2,
     smoothing = 8,
@@ -232,9 +264,11 @@ export default function Globe({
         markerConfig.size
     );
     const scaleMultiplier = mapScaleUiToMultiplier(scale);
+    const markersSerialized = JSON.stringify(markerConfig.markers || []);
 
     useEffect(() => {
         if (!containerRef.current) return;
+        let isDestroyed = false;
         const container = containerRef.current;
         const containerWidth =
             container.clientWidth || container.offsetWidth || 800;
@@ -442,11 +476,8 @@ export default function Globe({
         const loadWorldData = async () => {
             try {
                 setIsLoading(true);
-                const response = await fetch(
-                    "https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/50m/physical/ne_50m_land.json"
-                );
-                if (!response.ok) throw new Error("Failed to load land data");
-                const landFeatures = await response.json();
+                const landFeatures = await getLandFeatures();
+                if (isDestroyed) return;
 
                 while (continentOutlineGroup.children.length > 0) {
                     continentOutlineGroup.remove(
@@ -778,6 +809,7 @@ export default function Globe({
         markerMeshes.forEach((mesh) => globeGroup.add(mesh));
 
         const animate = () => {
+            if (isDestroyed) return;
             let needsRender = false;
             const threshold = 0.01;
             if (
@@ -912,27 +944,31 @@ export default function Globe({
         loadWorldData();
 
         return () => {
+            isDestroyed = true;
             if (animationFrameId !== null)
                 cancelAnimationFrame(animationFrameId);
             canvas.removeEventListener("mousedown", handleMouseDown);
             canvas.removeEventListener("mousemove", handleMouseMove);
             resizeObserver.disconnect();
             renderer.dispose();
-            container.removeChild(canvas);
+            if (canvas.parentNode === container) {
+                container.removeChild(canvas);
+            }
         };
     }, [
         speed,
         smoothing,
-        dots,
+        dotColor,
+        dotSize,
+        density,
+        allDots,
         fill,
         fillColor,
-        allDots,
-        density,
-        dotSize,
-        dotColor,
         scale,
         stopOnHover,
-        markerConfig,
+        markersSerialized,
+        markerConfig.color,
+        markerConfig.size,
         direction,
         initialLatitude,
         initialLongitude,

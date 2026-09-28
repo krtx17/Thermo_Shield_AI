@@ -121,7 +121,19 @@ const INITIAL_MOCK_HOTSPOTS: Hotspot[] = [
 ];
 
 export default function App() {
-  const [activeScreen, setActiveScreen] = useState<ActiveScreen>("home");
+  const [activeScreen, setActiveScreen] = useState<ActiveScreen>(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace("#", "") as ActiveScreen;
+      const validScreens: ActiveScreen[] = [
+        "home", "command-center", "active-investigations", "risk-comparison",
+        "incident-reports", "audit-trail", "system-health", "live-demo", "settings"
+      ];
+      if (validScreens.includes(hash)) return hash;
+      const saved = localStorage.getItem("thermo_shield_active_screen") as ActiveScreen;
+      if (saved && validScreens.includes(saved)) return saved;
+    }
+    return "home";
+  });
   const [modelMode, setModelMode] = useState<ModelMode>("cloud");
   const [hotspots, setHotspots] = useState<Hotspot[]>(INITIAL_MOCK_HOTSPOTS);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot>(INITIAL_MOCK_HOTSPOTS[0]);
@@ -138,6 +150,31 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
+  }, []);
+
+  // Persist active screen so user is never randomly kicked to home
+  useEffect(() => {
+    try {
+      localStorage.setItem("thermo_shield_active_screen", activeScreen);
+      window.location.hash = activeScreen;
+    } catch {
+      // ignore
+    }
+  }, [activeScreen]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "") as ActiveScreen;
+      const validScreens: ActiveScreen[] = [
+        "home", "command-center", "active-investigations", "risk-comparison",
+        "incident-reports", "audit-trail", "system-health", "live-demo", "settings"
+      ];
+      if (validScreens.includes(hash)) {
+        setActiveScreen(hash);
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   // Comparison IDs
@@ -222,7 +259,8 @@ export default function App() {
 
         {/* Viewport for Active Screen */}
         <main className="flex-1 pb-16 lg:pb-0 overflow-y-auto">
-          {activeScreen === "home" && (
+          {/* Home view is kept mounted to eliminate 3D WebGL re-initialization latency & glitches */}
+          <div className={activeScreen === "home" ? "w-full h-full" : "hidden"}>
             <Home
               hotspots={hotspots}
               setActiveScreen={setActiveScreen}
@@ -230,7 +268,7 @@ export default function App() {
               modelMode={modelMode}
               theme={theme}
             />
-          )}
+          </div>
 
           {activeScreen === "command-center" && (
             <CommandCenter
