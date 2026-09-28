@@ -39,7 +39,6 @@ export default function Sidebar({
   const navItems: { id: ActiveScreen; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: "home", label: "Home", icon: HomeIcon },
     { id: "command-center", label: "Live Map", icon: MapIcon },
-    { id: "computer-vision", label: "Computer Vision", icon: Scan },
     { id: "active-investigations", label: "Alerts", icon: Bell, badge: activeAlertsCount },
     { id: "live-demo", label: "Simulation", icon: Sparkles },
     { id: "about", label: "How It Works", icon: Info },

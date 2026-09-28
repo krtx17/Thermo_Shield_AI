@@ -5,6 +5,13 @@ import { AuthRequest, generateToken, AuthenticatedUser } from "../middleware/aut
 const OPERATORS: (AuthenticatedUser & { passwordHash: string })[] = [
   {
     id: "OP-TS-8492",
+    name: "Commander Alex Vance",
+    email: "commander@thermoshield.defense",
+    role: "CHIEF_OFFICER",
+    passwordHash: "command2026"
+  },
+  {
+    id: "OP-TS-8492-LEGACY",
     name: "Kritika Tripathi",
     email: "kritika.tripathi@thermoshield.defense",
     role: "CHIEF_OFFICER",

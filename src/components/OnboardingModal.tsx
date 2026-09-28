@@ -2,16 +2,14 @@ import React, { useState } from "react";
 import {
   Shield,
   Globe,
-  Scan,
+  Radio,
   Cpu,
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
   X,
   Sparkles,
-  Flame,
-  Radio,
-  Eye
+  Bell
 } from "lucide-react";
 import { ActiveScreen, UserProfile } from "../types";
 
@@ -36,78 +34,73 @@ export default function OnboardingModal({
 
   const steps = [
     {
-      title: `Welcome to Thermo Shield AI, ${user?.name ? user.name.split(" ")[0] : "Operator"}!`,
-      subtitle: "Autonomous Space-to-Ground Multispectral Early Warning",
-      badge: "Security Clearance Activated",
+      title: `Welcome, ${user?.name ? user.name.split(" ")[0] : "Commander"}!`,
+      subtitle: "Autonomous Spaceborne Thermal Defense",
+      badge: "Clearance Active",
       icon: Shield,
       color: "text-[#38bdf8]",
       bgColor: "bg-blue-500/15 border-blue-500/30",
       description:
-        "You have been granted operational access to Thermo Shield AI—an autonomous spaceborne defense network protecting hydrocarbon refineries, chemical enclaves, and rural interfaces from catastrophic fire flashovers before ground detectors can react.",
+        "Autonomous satellite monitoring protecting refineries and storage tanks from fire flashovers before ground alarms trigger.",
       highlights: [
-        "Continuous 24/7 low-Earth-orbit satellite monitoring (VIIRS & Sentinel-2)",
-        "Early warning detection at 30+ MW before visual flame breaches enclosure",
-        "Automated state DEOC dispatch and high-pressure deluge barrier deployment"
+        "Continuous 24/7 low-Earth orbit satellite monitoring (VIIRS & Sentinel-2)",
+        "Early warning detection at 30+ MW before flame breaches enclosures"
       ]
     },
     {
-      title: "Interactive 3D Global & Live Tactical Map",
-      subtitle: "Real-Time Orbital Hotspot Tracking",
-      badge: "Spaceborne Telemetry",
+      title: "Interactive 3D Global & Tactical Map",
+      subtitle: "Live Orbital Telemetry",
+      badge: "Geospatial Tracking",
       icon: Globe,
       color: "text-blue-400",
       bgColor: "bg-blue-500/15 border-blue-500/30",
       description:
-        "The Command Center pairs a high-performance 3D WebGL Earth globe with a 2D tactical incident map. Monitor live orbital passes, query regional industrial clusters, and filter anomalies by severity from CRITICAL to MONITORED.",
+        "High-performance 3D WebGL globe and 2D tactical map for tracking real-time hotspot clusters.",
       highlights: [
-        "Rotate the 3D globe with touch or mouse to inspect global thermal flux",
-        "Click any regional hotspot pin to inspect real-time sensor telemetry",
-        "Direct road access, nearest fire stations, and OSM asset proximity buffers"
+        "Global thermal radiant flux (FRP) and live satellite passes",
+        "Asset proximity buffers, nearest fire stations, and route access"
       ]
     },
     {
-      title: "Computer Vision & Multispectral Studio",
-      subtitle: "YOLOv11-Thermal & Band Decomposition",
-      badge: "Deep Learning Studio",
-      icon: Scan,
+      title: "Backend Multispectral Neural Vision",
+      subtitle: "YOLOv11 & SWIR Band Decomposition",
+      badge: "Vision AI Engine",
+      icon: Radio,
       color: "text-rose-400",
       bgColor: "bg-rose-500/15 border-rose-500/30",
       description:
-        "Inspect high-resolution satellite tiles and aerial drone FLIR feeds. Our custom YOLOv11-Thermal model segments active flame cores, aerosol smoke plumes, and vulnerable tanks in under 20ms with multi-band SWIR/NIR spectral validation.",
+        "Sub-20ms backend neural network segments active flame cores, smoke aerosols, and vulnerable facility tanks.",
       highlights: [
-        "Toggle False-Color SWIR Infrared, FLIR Ironbow, and NBR burn ratios",
-        "Interactive bounding boxes with pixel coordinates, IoU, and thermal apex temp",
-        "Confidence threshold filtering and multispectral feature extraction"
+        "SWIR/NIR ratio hydrocarbon analysis and NBR burn indexing",
+        "Automated false-positive filtering against industrial flares"
       ]
     },
     {
-      title: "Gemini 2.5 Flash & Automated Containment",
-      subtitle: "Spatial Reasoning & Deluge Suppression",
-      badge: "Autonomous Action",
+      title: "Spatial AI & Automated Containment",
+      subtitle: "Gemini 2.5 Intelligence",
+      badge: "Automated Defense",
       icon: Cpu,
       color: "text-purple-400",
       bgColor: "bg-purple-500/15 border-purple-500/30",
       description:
-        "Google Gemini 2.5 Flash correlates thermal spikes against critical petrochemical assets, eliminates false alarms like routine industrial flaring, and autonomously engages perimeter deluge water curtains to stop fire spread.",
+        "Correlates thermal spikes against critical assets, calculates flashover risk, and deploys deluge barriers.",
       highlights: [
-        "Dynamic 0-100 Threat Score and Time-to-Asset Impact countdown",
-        "Automated chemical foam deluge curtain activation (1200 LPM)",
-        "Instant emergency dispatch broadcast to State DEOC operations"
+        "Dynamic 0–100 Threat Score and Time-to-Asset Impact countdown",
+        "Automated 1200 LPM deluge activation and instant DEOC dispatch"
       ]
     },
     {
-      title: "Operational Clearance Ready",
-      subtitle: "Choose Where You Want to Begin",
-      badge: "Deployment Stations",
+      title: "Clearance Activated",
+      subtitle: "Ready for Operation",
+      badge: "Operational",
       icon: CheckCircle2,
       color: "text-emerald-400",
       bgColor: "bg-emerald-500/15 border-emerald-500/30",
       description:
-        "Your workstation is fully synchronized with live telemetry feeds. Select your initial deployment module below to start defending critical industrial infrastructure:",
+        "Your workstation is synchronized with live orbital telemetry. Choose where to begin:",
       highlights: [
-        "Computer Vision Studio: Inspect multispectral flame bounding boxes",
-        "Simulation Sandbox: Test dynamic wind vectors and deluge barriers",
-        "Command Center: Monitor real-time geospatial hotspots across India"
+        "Command Center: Monitor real-time geospatial hotspots",
+        "Simulation Sandbox: Model dynamic wind vectors and deluge barriers"
       ]
     }
   ];
@@ -127,7 +120,7 @@ export default function OnboardingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl p-6 sm:p-8 rounded-3xl bg-[#0b101d] border border-[#1e2c4a] shadow-2xl text-white flex flex-col gap-6">
+      <div className="relative w-full max-w-lg p-6 sm:p-7 rounded-3xl bg-[#0b101d] border border-[#1e2c4a] shadow-2xl text-white flex flex-col gap-5">
         
         {/* Top Progress & Close Bar */}
         <div className="flex items-center justify-between">
@@ -158,14 +151,14 @@ export default function OnboardingModal({
         </div>
 
         {/* Step Content */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start gap-4">
-            <div className={`p-3.5 rounded-2xl border ${stepData.bgColor} ${stepData.color} shrink-0`}>
-              <StepIcon className="h-6 w-6" />
+        <div className="flex flex-col gap-3.5">
+          <div className="flex items-start gap-3.5">
+            <div className={`p-3 rounded-2xl border ${stepData.bgColor} ${stepData.color} shrink-0`}>
+              <StepIcon className="h-5 w-5" />
             </div>
 
             <div className="flex flex-col">
-              <h2 className="text-lg sm:text-xl font-black tracking-tight text-white leading-tight">
+              <h2 className="text-base sm:text-lg font-black tracking-tight text-white leading-tight">
                 {stepData.title}
               </h2>
               <span className="text-xs text-slate-400 font-medium mt-0.5">
@@ -178,11 +171,11 @@ export default function OnboardingModal({
             {stepData.description}
           </p>
 
-          {/* Highlights checklist */}
-          <div className="p-4 rounded-2xl bg-[#070b14] border border-[#18233a] flex flex-col gap-2">
+          {/* Highlights checklist (concise 2 items) */}
+          <div className="p-3.5 rounded-2xl bg-[#070b14] border border-[#18233a] flex flex-col gap-2">
             {stepData.highlights.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-200">
-                <CheckCircle2 className="h-4 w-4 text-[#38bdf8] shrink-0 mt-0.5" />
+              <div key={idx} className="flex items-start gap-2 text-xs text-slate-200">
+                <CheckCircle2 className="h-3.5 w-3.5 text-[#38bdf8] shrink-0 mt-0.5" />
                 <span className="leading-snug">{item}</span>
               </div>
             ))}
@@ -190,13 +183,21 @@ export default function OnboardingModal({
 
           {/* Quick Destination Buttons on Last Step */}
           {isLast && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
               <button
-                onClick={() => handleFinish("computer-vision")}
-                className="p-2.5 rounded-xl bg-[#141d33] hover:bg-[#1e2c4d] border border-[#1e2c4a] text-xs font-bold text-cyan-300 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                onClick={() => handleFinish("command-center")}
+                className="p-2.5 rounded-xl bg-[#141d33] hover:bg-[#1e2c4d] border border-[#1e2c4a] text-xs font-bold text-blue-300 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
               >
-                <Scan className="w-3.5 h-3.5" />
-                <span>Computer Vision</span>
+                <Globe className="w-3.5 h-3.5" />
+                <span>Live Map</span>
+              </button>
+
+              <button
+                onClick={() => handleFinish("active-investigations")}
+                className="p-2.5 rounded-xl bg-[#141d33] hover:bg-[#1e2c4d] border border-[#1e2c4a] text-xs font-bold text-rose-300 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Bell className="w-3.5 h-3.5" />
+                <span>Alerts</span>
               </button>
 
               <button
@@ -205,14 +206,6 @@ export default function OnboardingModal({
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Simulation</span>
-              </button>
-
-              <button
-                onClick={() => handleFinish("command-center")}
-                className="p-2.5 rounded-xl bg-[#141d33] hover:bg-[#1e2c4d] border border-[#1e2c4a] text-xs font-bold text-blue-300 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              >
-                <Globe className="w-3.5 h-3.5" />
-                <span>Live Map</span>
               </button>
             </div>
           )}
@@ -231,7 +224,7 @@ export default function OnboardingModal({
             {currentStep > 0 && (
               <button
                 onClick={() => setCurrentStep((prev) => prev - 1)}
-                className="px-3.5 py-2 rounded-xl bg-[#141d33] hover:bg-[#1e2c4d] border border-[#1e2c4a] text-xs font-semibold text-slate-300 flex items-center gap-1 transition-all cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-[#141d33] hover:bg-[#1e2c4d] border border-[#1e2c4a] text-xs font-semibold text-slate-300 flex items-center gap-1 transition-all cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Back</span>
@@ -241,7 +234,7 @@ export default function OnboardingModal({
             {!isLast ? (
               <button
                 onClick={() => setCurrentStep((prev) => prev + 1)}
-                className="px-4 py-2 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-xs font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-blue-600/30"
+                className="px-4 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-xs font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-blue-600/30"
               >
                 <span>Continue</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -249,10 +242,10 @@ export default function OnboardingModal({
             ) : (
               <button
                 onClick={() => handleFinish("home")}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-emerald-600/30"
+                className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-emerald-600/30"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Enter Command Dashboard</span>
+                <span>Enter Dashboard</span>
               </button>
             )}
           </div>

@@ -12,7 +12,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
   // Login form state
-  const [email, setEmail] = useState("kritika.tripathi@thermoshield.defense");
+  const [email, setEmail] = useState("commander@thermoshield.defense");
   const [password, setPassword] = useState("command2026");
 
   // Register form state
@@ -108,10 +108,10 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-tight text-white">
-                {authMode === "login" ? "Operator Clearance Login" : "Register New Security Clearance"}
+                {authMode === "login" ? "Operator Clearance Login" : "Register Security Clearance"}
               </h2>
               <p className="text-[11px] text-slate-400">
-                Thermo Shield Tactical Intelligence Terminal
+                Thermo Shield Tactical Terminal
               </p>
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
             }`}
           >
             <UserPlus className="h-3.5 w-3.5" />
-            <span>New Operator Account</span>
+            <span>Register Account</span>
           </button>
         </div>
 
@@ -169,20 +169,20 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
             {/* Quick Credentials Selection */}
             <div className="mt-3 p-3 rounded-xl bg-[#070b14] border border-[#18233a] flex flex-col gap-2">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Quick Select Preset Clearance:
+                Quick Clearance Preset:
               </span>
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => handleQuickSelect("kritika.tripathi@thermoshield.defense", "command2026")}
+                  onClick={() => handleQuickSelect("commander@thermoshield.defense", "command2026")}
                   className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border transition-all cursor-pointer ${
-                    email.includes("kritika")
+                    email.includes("commander")
                       ? "bg-[#2563eb] text-white border-blue-400 shadow-sm"
                       : "bg-[#10172a] text-slate-300 border-[#1e2c4a] hover:bg-slate-800"
                   }`}
                 >
                   <User className="h-3.5 w-3.5" />
-                  <span>Chief Officer</span>
+                  <span>Cmdr. Vance</span>
                 </button>
                 <button
                   type="button"

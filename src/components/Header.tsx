@@ -1,19 +1,13 @@
 import React, { useState } from "react";
 import { ActiveScreen, ModelMode, UserProfile } from "../types";
 import { 
-  Search, 
   Menu as MenuIcon, 
   ChevronDown,
-  X,
   LogIn,
   LogOut,
   Shield,
-  HelpCircle,
-  Scan,
-  Sparkles
+  HelpCircle
 } from "lucide-react";
-// @ts-ignore
-import profilePic from "../assets/images/kritika_profile.jpg";
 
 interface HeaderProps {
   activeScreen?: ActiveScreen;
@@ -38,30 +32,25 @@ export default function Header({
   activeScreen = "home",
   setActiveScreen,
   onMenuToggle,
-  searchQuery = "",
-  setSearchQuery,
   currentUser,
   onOpenAuthModal,
   onLogout,
-  onOpenOnboarding,
-  onOpenDispatchModal
+  onOpenOnboarding
 }: HeaderProps) {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [isSearchActive, setIsSearchActive] = useState(false);
 
+  // Clean, focused core navigation links (only necessary items, Computer Vision handled in backend)
   const navLinks: { id: ActiveScreen; label: string }[] = [
     { id: "home", label: "Home" },
     { id: "command-center", label: "Live Map" },
-    { id: "computer-vision", label: "Computer Vision" },
     { id: "active-investigations", label: "Alerts" },
     { id: "live-demo", label: "Simulation" },
-    { id: "about", label: "How It Works" },
     { id: "system-health", label: "Analytics" },
   ];
 
   return (
-    <header className="h-16 px-4 lg:px-8 flex items-center justify-between border-b transition-colors duration-200 z-30 sticky top-0 backdrop-blur-md bg-[#0b101d]/90 border-[#18233a] text-white">
-      {/* Left side: Mobile menu toggle + Brand + Clickable Nav Links (Unboxed) */}
+    <header className="h-16 px-4 sm:px-6 lg:px-8 border-b transition-colors duration-200 z-30 sticky top-0 backdrop-blur-md bg-[#0b101d]/90 border-[#18233a] text-white flex items-center justify-between">
+      {/* Left side: Mobile menu toggle + Brand + Essential Nav Links */}
       <div className="flex items-center gap-3 lg:gap-6">
         <button
           onClick={onMenuToggle}
@@ -77,7 +66,7 @@ export default function Header({
           onClick={() => setActiveScreen("home")}
           className="flex items-center gap-2.5 cursor-pointer group select-none"
         >
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg overflow-hidden bg-[#070b14] border border-[#1e2c4a] flex items-center justify-center shadow-sm shadow-blue-900/30 group-hover:scale-105 transition-transform shrink-0">
+          <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#070b14] border border-[#1e2c4a] flex items-center justify-center shadow-sm shadow-blue-900/30 group-hover:scale-105 transition-transform shrink-0">
             <img 
               src="/app_icon.png" 
               alt="Thermo Shield AI" 
@@ -89,7 +78,7 @@ export default function Header({
           </span>
         </div>
 
-        {/* Clean, Unboxed Clickable Navigation Links */}
+        {/* Clean, Uncluttered Clickable Navigation Links */}
         <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = activeScreen === link.id;
@@ -110,74 +99,28 @@ export default function Header({
         </nav>
       </div>
 
-      {/* Right side: Clickable Search + Clickable Dispatch + Clickable Profile / Auth */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Minimal Unboxed Search Bar */}
-        <div className="relative flex items-center">
-          <div className="absolute left-2.5 text-slate-400 pointer-events-none">
-            <Search className="h-4 w-4" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onFocus={() => setIsSearchActive(true)}
-            onBlur={() => setIsSearchActive(false)}
-            onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
-            placeholder="Search hotspots..."
-            className={`pl-8 pr-3 py-1.5 text-xs sm:text-sm text-slate-200 placeholder-slate-500 rounded-lg transition-all focus:outline-none ${
-              isSearchActive || searchQuery
-                ? "w-40 sm:w-56 bg-white/[0.07]"
-                : "w-28 sm:w-40 bg-white/[0.03] hover:bg-white/[0.05]"
-            }`}
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery && setSearchQuery("")}
-              className="absolute right-2 text-slate-400 hover:text-white p-0.5 cursor-pointer"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          )}
-        </div>
-
-        {/* Clickable Quick Tactical Dispatch Action */}
-        {onOpenDispatchModal && (
-          <button
-            onClick={onOpenDispatchModal}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
-            <span className="hidden sm:inline">Dispatch</span>
-          </button>
-        )}
-
-        {/* Operator Profile / Login Button */}
+      {/* Right side: Perfectly positioned Sign In / Register or Operator Profile */}
+      <div className="flex items-center gap-3">
         {currentUser ? (
           <div className="relative">
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/[0.05] transition-colors cursor-pointer select-none"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-white/[0.05] border border-transparent hover:border-[#1e2c4a] transition-colors cursor-pointer select-none"
               type="button"
             >
               {currentUser.avatar ? (
                 <img
                   src={currentUser.avatar}
                   alt={currentUser.name}
-                  className="w-7 h-7 rounded-full object-cover"
-                />
-              ) : currentUser.name.toLowerCase().includes("kritika") ? (
-                <img
-                  src={profilePic}
-                  alt={currentUser.name}
-                  className="w-7 h-7 rounded-full object-cover"
+                  className="w-7 h-7 rounded-full object-cover ring-1 ring-blue-500/40"
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-[#2563eb] text-white text-xs font-bold flex items-center justify-center">
-                  {currentUser.name.charAt(0).toUpperCase()}
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 text-white text-xs font-bold flex items-center justify-center ring-1 ring-white/20">
+                  {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : "C"}
                 </div>
               )}
-              <span className="hidden md:inline text-xs font-semibold text-slate-200">
-                {currentUser.name.split(" ")[0]}
+              <span className="hidden sm:inline text-xs font-semibold text-slate-200">
+                {currentUser.name ? currentUser.name.split(" ")[0] : "Commander"}
               </span>
               <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
             </button>
@@ -262,10 +205,10 @@ export default function Header({
             )}
           </div>
         ) : (
-          /* Sign In / Register Button for unauthenticated users */
+          /* Prominent, clean Sign In / Register Button with proper breathing room */
           <button
             onClick={onOpenAuthModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold transition-all shadow-md shadow-blue-600/30 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold transition-all shadow-md shadow-blue-600/30 cursor-pointer whitespace-nowrap"
           >
             <LogIn className="w-3.5 h-3.5" />
             <span>Sign In / Register</span>
