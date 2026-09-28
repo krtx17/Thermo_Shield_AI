@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   Scan,
   Eye,
@@ -17,7 +17,10 @@ import {
   ArrowRight,
   Filter,
   Zap,
-  Info
+  Info,
+  Camera,
+  CameraOff,
+  Video
 } from "lucide-react";
 import { ActiveScreen } from "../types";
 
@@ -267,6 +270,49 @@ const SAMPLE_TILES: SatelliteTile[] = [
         riskNote: "Located 1.2km east across irrigation canal. Safe from thermal exposure."
       }
     ]
+  },
+  {
+    id: "tile-camera",
+    title: "Live Optical & Thermal Web Camera",
+    sensor: "Device Optical Sensor (Live Webcam)",
+    resolution: "1080p High-Speed Frame Capture",
+    coordinates: "Local Command Terminal (Live)",
+    captureTime: "Real-time Stream",
+    backgroundStyle: "from-[#080d18] via-[#0f172a] to-[#050811]",
+    spectralBands: ["Optical RGB", "Simulated FLIR IR Overlay", "Motion Saliency"],
+    maxTemp: "Live Optical Scan",
+    detections: [
+      {
+        id: "DET-CAM-01",
+        className: "Active Flame Core",
+        confidence: 0.942,
+        x: 220,
+        y: 150,
+        width: 140,
+        height: 100,
+        color: "#f43f5e",
+        thermalTemp: "Optical Core Locked",
+        pixelArea: "14,000 px²",
+        groundArea: "Live Camera Target",
+        substance: "Optical Brightness Peak",
+        riskNote: "Real-time high-intensity luminance/chrominance threshold match."
+      },
+      {
+        id: "DET-CAM-02",
+        className: "Smoke / Aerosol Plume",
+        confidence: 0.884,
+        x: 200,
+        y: 80,
+        width: 220,
+        height: 90,
+        color: "#f59e0b",
+        thermalTemp: "Ambient Plume",
+        pixelArea: "19,800 px²",
+        groundArea: "Live Dispersion Zone",
+        substance: "Aerosol Haze Dispersion",
+        riskNote: "Diffuse plume boundary detected via spatial gradient variance."
+      }
+    ]
   }
 ];
 
@@ -298,6 +344,43 @@ export default function ComputerVision({
   // Threshold controls
   const [confidenceThreshold, setConfidenceThreshold] = useState<number>(0.75);
 
+  // Live Optical Webcam Stream
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
+
+  const toggleCamera = async () => {
+    if (isCameraActive) {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+      setIsCameraActive(false);
+    } else {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setIsCameraActive(true);
+      } catch (err) {
+        console.warn("Camera access not available or denied:", err);
+        alert("Camera access was not granted or is unavailable on this device. Displaying tactical optical simulation feed.");
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   // Filter detections based on confidence threshold
   const visibleDetections = useMemo(() => {
     return selectedTile.detections.filter((d) => d.confidence >= confidenceThreshold);
@@ -307,6 +390,9 @@ export default function ComputerVision({
   const handleSelectTile = (tile: SatelliteTile) => {
     setSelectedTile(tile);
     setSelectedDetection(tile.detections[0]);
+    if (tile.id === "tile-camera" && !isCameraActive) {
+      toggleCamera();
+    }
   };
 
   return (
@@ -477,9 +563,25 @@ export default function ComputerVision({
                 ))}
               </div>
 
-              {/* Resolution & Sensor Spec */}
-              <div className="text-[11px] font-mono text-slate-400 shrink-0">
-                {selectedTile.resolution}
+              {/* Resolution & Sensor Spec & Camera Controls */}
+              <div className="flex items-center gap-2">
+                {selectedTile.id === "tile-camera" && (
+                  <button
+                    onClick={toggleCamera}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      isCameraActive
+                        ? "bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-600/30"
+                        : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/30"
+                    }`}
+                  >
+                    {isCameraActive ? <CameraOff className="w-3.5 h-3.5" /> : <Camera className="w-3.5 h-3.5" />}
+                    <span>{isCameraActive ? "Stop Camera" : "Turn On Camera"}</span>
+                  </button>
+                )}
+
+                <div className="text-[11px] font-mono text-slate-400 shrink-0">
+                  {selectedTile.resolution}
+                </div>
               </div>
 
             </div>
@@ -487,9 +589,20 @@ export default function ComputerVision({
             {/* Tactical CV Canvas Viewport */}
             <div className={`relative w-full rounded-xl overflow-hidden border aspect-[16/10] bg-gradient-to-br ${selectedTile.backgroundStyle} border-[#1e2c4a]`}>
               
+              {/* Live Video Feed Background */}
+              {isCameraActive && selectedTile.id === "tile-camera" && (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                />
+              )}
+
               <svg
                 viewBox="0 0 640 400"
-                className="w-full h-full select-none"
+                className="relative z-10 w-full h-full select-none"
                 preserveAspectRatio="xMidYMid meet"
               >
                 <defs>
