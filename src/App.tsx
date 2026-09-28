@@ -19,6 +19,9 @@ import {
   Menu
 } from "lucide-react";
 import Particles from "./components/Particles";
+import AuthModal from "./components/AuthModal";
+import CreateHotspotModal from "./components/CreateHotspotModal";
+import { useRealTimeTelemetry } from "./hooks/useRealTimeTelemetry";
 
 // Fallback seed data in case of network latency
 const INITIAL_MOCK_HOTSPOTS: Hotspot[] = [
@@ -139,6 +142,24 @@ export default function App() {
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot>(INITIAL_MOCK_HOTSPOTS[0]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Real-time WebSocket Telemetry stream
+  const { isConnected: isLiveConnected, latestFlux } = useRealTimeTelemetry();
+
+  useEffect(() => {
+    if (!latestFlux) return;
+    setHotspots((prev) =>
+      prev.map((h) => {
+        if (h.id === latestFlux.hotspotId) {
+          return { ...h, meanFRP: latestFlux.meanFRP };
+        }
+        return h;
+      })
+    );
+  }, [latestFlux]);
 
   // App Theme is locked to unified dark command center theme
   const [theme, setTheme] = useState<"light" | "dark">("dark");
@@ -255,6 +276,9 @@ export default function App() {
           onMenuToggle={() => setIsSidebarOpen(true)}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          isLiveConnected={isLiveConnected}
+          onOpenAuthModal={() => setIsAuthModalOpen(true)}
+          onOpenDispatchModal={() => setIsDispatchModalOpen(true)}
         />
 
         {/* Viewport for Active Screen */}
@@ -373,6 +397,23 @@ export default function App() {
         </div>
 
       </div>
+
+      {/* Security Clearance Operator Login Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={(user) => setCurrentUser(user)}
+      />
+
+      {/* Quick Tactical Hotspot / Anomaly Dispatch Modal */}
+      <CreateHotspotModal
+        isOpen={isDispatchModalOpen}
+        onClose={() => setIsDispatchModalOpen(false)}
+        onHotspotCreated={(newHotspot) => {
+          setHotspots((prev) => [newHotspot, ...prev]);
+          setSelectedHotspot(newHotspot);
+        }}
+      />
 
     </div>
   );

@@ -8,8 +8,16 @@ export class HotspotService {
     return this.repo.findAll(options);
   }
 
+  public getHotspotsNear(targetLat: number, targetLng: number, radiusKm = 150): HotspotRecord[] {
+    return this.repo.findNearCoordinates(targetLat, targetLng, radiusKm);
+  }
+
   public getHotspotById(id: string): HotspotRecord | undefined {
     return this.repo.findById(id);
+  }
+
+  public async createHotspot(hotspot: HotspotRecord): Promise<HotspotRecord> {
+    return await this.repo.save(hotspot);
   }
 
   public getHotspotCount(): number {

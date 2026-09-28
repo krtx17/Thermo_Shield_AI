@@ -4,6 +4,7 @@ import { HotspotController } from "../controllers/hotspot.controller.js";
 const router = Router();
 
 router.get("/hotspots", HotspotController.getAll);
+router.post("/hotspots", HotspotController.create);
 router.get("/hotspots/:id", HotspotController.getById);
 
 export default router;

@@ -1,3 +1,4 @@
+import http from "http";
 import path from "path";
 import express from "express";
 import { createServer as createViteServer } from "vite";
@@ -7,6 +8,8 @@ import { initPostgresDatabase } from "./server/db/postgres.js";
 import { hotspotRepository } from "./server/repositories/hotspot.repository.js";
 import { auditRepository } from "./server/repositories/audit.repository.js";
 import { reportRepository } from "./server/repositories/report.repository.js";
+import { telemetryHub } from "./server/websocket/hub.js";
+import { telemetryWorker } from "./server/workers/telemetry.worker.js";
 
 // Re-export domain interfaces for backward-compatibility
 export type { HotspotRecord } from "./server/models/hotspot.model.js";
@@ -16,7 +19,7 @@ export type { IncidentReportRecord } from "./server/models/report.model.js";
 /**
  * Bootstrap Server:
  * Initializes PostgreSQL database, binds Vite middleware (in development)
- * or static files (in production), then begins listening on configured port.
+ * or static files (in production), attaches WebSocket hub, then begins listening.
  */
 async function startServer() {
   const isDbReady = await initPostgresDatabase();
@@ -44,12 +47,21 @@ async function startServer() {
     });
   }
 
+  // Create unified HTTP server for Express and WebSockets
+  const httpServer = http.createServer(app);
+
+  // Initialize real-time telemetry streaming WebSocket hub
+  telemetryHub.init(httpServer);
+
+  // Start autonomous background satellite ingestion worker
+  telemetryWorker.start();
+
   function listenOnPort(p: number) {
-    const srv = app.listen(p, "0.0.0.0", () => {
+    httpServer.listen(p, "0.0.0.0", () => {
       console.log(`[THERMO-SHIELD AI Server] running at http://localhost:${p}`);
     });
 
-    srv.on("error", (err: any) => {
+    httpServer.on("error", (err: any) => {
       if (err.code === "EADDRINUSE" && p === 3000) {
         console.warn(`[THERMO-SHIELD] Port 3000 in use, falling back to port 3001...`);
         listenOnPort(3001);

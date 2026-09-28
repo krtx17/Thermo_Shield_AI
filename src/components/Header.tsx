@@ -23,6 +23,9 @@ interface HeaderProps {
   onMenuToggle: () => void;
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
+  isLiveConnected?: boolean;
+  onOpenAuthModal?: () => void;
+  onOpenDispatchModal?: () => void;
 }
 
 export default function Header({
@@ -31,7 +34,10 @@ export default function Header({
   setModelMode,
   onMenuToggle,
   searchQuery = "",
-  setSearchQuery
+  setSearchQuery,
+  isLiveConnected = true,
+  onOpenAuthModal,
+  onOpenDispatchModal
 }: HeaderProps) {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
@@ -62,8 +68,25 @@ export default function Header({
         </div>
       </div>
 
-      {/* Right side: Weather widget, AI mode pill, Profile */}
+      {/* Right side: Live stream badge, Dispatch button, Weather, AI mode pill, Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Live WebSocket Telemetry Indicator */}
+        <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-[#10172a] border-[#1e2c4a] text-slate-300">
+          <span className={`w-2 h-2 rounded-full ${isLiveConnected ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
+          <span>{isLiveConnected ? "Satellite Stream Active" : "Stream Connecting"}</span>
+        </div>
+
+        {/* Quick Manual Dispatch Button */}
+        {onOpenDispatchModal && (
+          <button
+            onClick={onOpenDispatchModal}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 transition-all cursor-pointer"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+            <span>Dispatch Anomaly</span>
+          </button>
+        )}
+
         {/* Subtle Weather / Atmosphere Pill */}
         <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border bg-[#10172a] border-[#1e2c4a] text-slate-300">
           <CloudSun className="h-3.5 w-3.5 text-amber-400" />
@@ -131,6 +154,28 @@ export default function Header({
               </div>
 
               <div className="py-1">
+                {onOpenAuthModal && (
+                  <button
+                    onClick={() => {
+                      onOpenAuthModal();
+                      setProfileDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 text-blue-400 font-medium"
+                  >
+                    Switch Security Clearance
+                  </button>
+                )}
+                {onOpenDispatchModal && (
+                  <button
+                    onClick={() => {
+                      onOpenDispatchModal();
+                      setProfileDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 text-rose-400 font-medium"
+                  >
+                    Manual Anomaly Dispatch
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setActiveScreen("settings");

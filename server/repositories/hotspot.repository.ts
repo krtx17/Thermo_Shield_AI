@@ -181,6 +181,34 @@ export class HotspotRepository {
   public count(): number {
     return this.hotspots.length;
   }
+
+  /**
+   * Spatial Proximity Search using Haversine Great-Circle Distance
+   */
+  public findNearCoordinates(targetLat: number, targetLng: number, radiusKm = 150): HotspotRecord[] {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const R = 6371; // Earth radius in km
+
+    return this.hotspots.filter((h) => {
+      const latMatch = h.coordinates.match(/([\d.]+)\s*°?\s*([NS])/i);
+      const lngMatch = h.coordinates.match(/([\d.]+)\s*°?\s*([EW])/i);
+      if (!latMatch || !lngMatch) return false;
+
+      const lat = parseFloat(latMatch[1]) * (latMatch[2].toUpperCase() === "S" ? -1 : 1);
+      const lng = parseFloat(lngMatch[1]) * (lngMatch[2].toUpperCase() === "W" ? -1 : 1);
+
+      const dLat = toRad(lat - targetLat);
+      const dLng = toRad(lng - targetLng);
+
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(targetLat)) * Math.cos(toRad(lat)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+
+      return distance <= radiusKm;
+    });
+  }
 }
 
 export const hotspotRepository = new HotspotRepository();

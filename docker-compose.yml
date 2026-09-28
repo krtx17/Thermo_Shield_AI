@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  # PostgreSQL 18 Database Engine
+  postgres:
+    image: postgres:18-alpine
+    container_name: thermo_shield_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: thermo_shield
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d thermo_shield"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Thermo Shield AI Application Server
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thermo_shield_app
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/thermo_shield
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgrespassword
+      PGDATABASE: thermo_shield
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
