@@ -161,10 +161,6 @@ export default function Home({
           
           {/* Top-Left: Project Mission & AI Intelligence Header (Strictly in Corner, Clears Globe) */}
           <div className="absolute top-6 left-6 z-20 max-w-xs sm:max-w-sm pointer-events-auto">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase bg-blue-500/10 border border-blue-500/20 text-[#38bdf8] mb-2 shadow-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              Autonomous Satellite AI
-            </div>
             <h1 className="text-base sm:text-xl font-extrabold tracking-tight leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
               AI-Powered Detection<br />for a Safer Tomorrow
             </h1>
