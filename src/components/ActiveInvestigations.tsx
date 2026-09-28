@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Hotspot, ModelMode, ActiveScreen } from "../types";
 import { 
   ArrowLeft, 
+  ArrowRight,
   Flame, 
   Sparkles, 
   Send, 
@@ -387,14 +388,29 @@ ${selectedHotspot.recommendation}
             </div>
           </div>
 
-          {/* Primary Action Button matching reference */}
-          <button
-            onClick={() => setIsActionModalOpen(true)}
-            className="w-full h-11 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
-          >
-            <span>Take Action</span>
-            <span className="text-lg leading-none">→</span>
-          </button>
+          {/* Action Control Group: Take Action & Compare With Another */}
+          <div className="flex flex-col gap-2.5">
+            <button
+              onClick={() => setIsActionModalOpen(true)}
+              className="w-full h-10 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-900/30 transition-all duration-150 active:scale-[0.99] cursor-pointer"
+            >
+              <span>Take Action</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+
+            <button
+              onClick={() => {
+                if (setCompareAId && setActiveScreen) {
+                  setCompareAId(selectedHotspot.id);
+                  setActiveScreen("risk-comparison");
+                }
+              }}
+              className="w-full h-10 px-4 rounded-xl bg-[#121a2d] hover:bg-[#19243d] border border-[#1e2c4a] hover:border-[#2563eb]/50 text-slate-200 hover:text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.99] cursor-pointer shadow-xs"
+            >
+              <GitCompare className="h-4 w-4 text-[#38bdf8]" />
+              <span>Compare With Another Facility</span>
+            </button>
+          </div>
 
           {/* Sub-option 1: Technical Telemetry Accordion */}
           <div className="border border-[#18233a] rounded-xl overflow-hidden bg-[#0e1627]">
@@ -476,19 +492,7 @@ ${selectedHotspot.recommendation}
             )}
           </div>
 
-          {/* Compare corridor button */}
-          <button
-            onClick={() => {
-              if (setCompareAId && setCompareBId && setActiveScreen) {
-                setCompareAId(selectedHotspot.id);
-                setActiveScreen("risk-comparison");
-              }
-            }}
-            className="w-full h-9 rounded-xl bg-[#141d33] hover:bg-[#1e2c4d] border border-[#1e2c4a] text-xs font-semibold flex items-center justify-center gap-2 text-slate-200 transition-colors cursor-pointer"
-          >
-            <GitCompare className="h-3.5 w-3.5" />
-            <span>Compare With Another Facility</span>
-          </button>
+
 
         </div>
 
