@@ -66,16 +66,21 @@ export default function Header({
           onClick={() => setActiveScreen("home")}
           className="flex items-center gap-2.5 cursor-pointer group select-none"
         >
-          <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#070b14] border border-[#1e2c4a] flex items-center justify-center shadow-sm shadow-blue-900/30 group-hover:scale-105 transition-transform shrink-0">
+          <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#070b14] border border-orange-500/30 flex items-center justify-center shadow-sm shadow-orange-950/40 group-hover:scale-105 transition-transform shrink-0">
             <img 
               src="/app_icon.png" 
               alt="Thermo Shield AI" 
               className="w-full h-full object-cover" 
             />
           </div>
-          <span className="text-sm font-bold tracking-tight text-white hidden sm:inline">
-            Thermo Shield
-          </span>
+          <div className="hidden sm:flex items-center gap-1.5">
+            <span className="text-sm font-bold tracking-tight text-white">
+              Thermo Shield
+            </span>
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-400 border border-orange-500/35">
+              AI
+            </span>
+          </div>
         </div>
 
         {/* Clean, Uncluttered Clickable Navigation Links */}

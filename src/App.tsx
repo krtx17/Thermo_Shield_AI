@@ -266,7 +266,7 @@ export default function App() {
       {/* ========================================================================= */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-75">
         <Particles
-          particleColors={["#38bdf8", "#818cf8", "#ffffff", "#0284c7"]}
+          particleColors={["#f97316", "#ef4444", "#fbbf24", "#38bdf8", "#0284c7"]}
           particleCount={75}
           particleSpread={12}
           speed={0.12}

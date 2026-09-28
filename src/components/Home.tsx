@@ -171,11 +171,11 @@ export default function Home({
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-2.5">
               <button
-                onClick={() => setActiveScreen("computer-vision")}
+                onClick={() => setActiveScreen("command-center")}
                 className="px-2.5 py-1 rounded-lg bg-[#2563eb] hover:bg-[#1d4ed8] text-[10px] font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-blue-600/30"
               >
-                <Scan className="w-3 h-3" />
-                <span>Computer Vision</span>
+                <Compass className="w-3 h-3" />
+                <span>3D Live Map</span>
               </button>
               <button
                 onClick={() => setActiveScreen("about")}

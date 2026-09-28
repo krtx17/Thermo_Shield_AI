@@ -1,19 +1,21 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:070B14,50:0D1F3C,100:1E3A8A&height=200&section=header&text=THERMO%20SHIELD%20AI&fontSize=50&fontColor=38BDF8&fontAlignY=38&desc=Autonomous%20Space-to-Ground%20Multispectral%20Early%20Warning%20Network&descAlignY=60&descSize=16&animation=fadeIn" alt="Thermo Shield AI Banner" />
+  <img src="public/thermo_shield_banner.jpg" alt="Thermo Shield AI — Autonomous Spaceborne Thermal Defense" width="100%" style="border-radius: 16px; box-shadow: 0 8px 32px rgba(234, 88, 12, 0.25);" />
 </p>
 
-<h1 align="center">THERMO SHIELD AI</h1>
+<h1 align="center">
+  🔥 THERMO SHIELD AI 🛰️
+</h1>
 
 <p align="center">
   <b>Autonomous Spaceborne Early Warning, Multispectral Thermal Telemetry, and Rapid Perimeter Deluge Containment for Critical Industrial Hydrocarbon Infrastructure.</b>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/System-v1.2.0%20Production-0284c7?style=for-the-badge&logo=shield&logoColor=white" alt="Version 1.2.0"/>
-  <img src="https://img.shields.io/badge/Clearance-Level%205%20Defense-38bdf8?style=for-the-badge&logo=auth0&logoColor=white" alt="Clearance Level 5"/>
-  <img src="https://img.shields.io/badge/Satellites-VIIRS%20%2B%20Sentinel--2-2563eb?style=for-the-badge&logo=nasa&logoColor=white" alt="Satellites"/>
-  <img src="https://img.shields.io/badge/AI%20Engine-Gemini%202.5%20Flash-8b5cf6?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini 2.5 Flash"/>
-  <img src="https://img.shields.io/badge/Inference-Sub--20ms-10b981?style=for-the-badge&logo=speedtest&logoColor=white" alt="Inference Speed"/>
+  <img src="https://img.shields.io/badge/Thermal%20Defense-Autonomous%20Early%20Warning-ea580c?style=for-the-badge&logo=fire&logoColor=white" alt="Thermal Defense"/>
+  <img src="https://img.shields.io/badge/Sensor%20Fusion-VIIRS%20%2B%20Sentinel--2-f97316?style=for-the-badge&logo=nasa&logoColor=white" alt="Satellites"/>
+  <img src="https://img.shields.io/badge/Suppression-1200%20LPM%20Deluge%20Barrier-dc2626?style=for-the-badge&logo=shield&logoColor=white" alt="Deluge Barrier"/>
+  <img src="https://img.shields.io/badge/Neural%20Core-Gemini%202.5%20Flash-8b5cf6?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini"/>
+  <img src="https://img.shields.io/badge/Inference-Sub--20ms%20(67.5%20FPS)-10b981?style=for-the-badge&logo=speedtest&logoColor=white" alt="Inference Speed"/>
   <img src="https://img.shields.io/badge/Vitest-58%2F58%20Passed%20(100%25)-10b981?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest 100%"/>
 </p>
 
@@ -525,5 +527,5 @@ npx.cmd tsc --noEmit
 This project is licensed under the **Apache License 2.0**. Commercial defense and industrial refinery deployments must adhere to safety clearance regulations.
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:1E3A8A,50:0D1F3C,100:070B14&height=120&section=footer" alt="Thermo Shield AI Footer"/>
+  <b>🛰️ Thermo Shield AI &bull; Orbital Multispectral Flashover Early Warning &bull; Space-to-Ground Active Defense 🔥</b>
 </p>
