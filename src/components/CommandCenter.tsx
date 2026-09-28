@@ -290,36 +290,39 @@ export default function CommandCenter({
           </button>
         </div>
 
-        {/* Top-Right Telemetry Card (Live Stream Metadata) */}
+        {/* Top-Right Telemetry Card (Live Stream Metadata) - Positioned below top controls to prevent any icon overlap */}
         {activeOverlays.includes("Telemetry") && (
-          <div className="absolute top-4 right-4 z-30 hidden sm:flex flex-col gap-1.5 p-3 rounded-2xl bg-[#0b101d]/90 border border-[#1e2c4a]/90 backdrop-blur-md shadow-xl text-left pointer-events-auto">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping shrink-0" />
-              <span className="text-[11px] font-bold text-rose-400 tracking-wide">
-                LIVE SATELLITE FEED • VIIRS / SENTINEL
-              </span>
+          <div className="absolute top-16 right-4 z-20 hidden md:flex flex-col gap-1 p-2.5 px-3 rounded-xl bg-[#0b101d]/90 border border-[#1e2c4a]/90 backdrop-blur-md shadow-xl text-left pointer-events-auto max-w-[270px]">
+            <div className="flex items-center justify-between gap-2 border-b border-[#1e2c4a]/60 pb-1 mb-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping shrink-0" />
+                <span className="text-[10px] font-bold text-rose-400 tracking-wide uppercase">
+                  Live Satellite Feed
+                </span>
+              </div>
+              <span className="text-[9px] font-semibold text-slate-400">VIIRS / SENTINEL</span>
             </div>
             
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1 text-[11px] text-slate-300">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-slate-300">
               <div>
-                <span className="text-slate-500 block text-[10px]">TIME (UTC)</span>
+                <span className="text-slate-500 block text-[9px]">TIME (UTC)</span>
                 <span className="font-mono font-semibold text-white">{utcTime || "14:32:00 UTC"}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">SURFACE WIND</span>
-                <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                  <Wind className="h-3 w-3" /> 14 km/h ↗ NE
+                <span className="text-slate-500 block text-[9px]">SURFACE WIND</span>
+                <span className="font-semibold text-emerald-400 flex items-center gap-0.5">
+                  <Wind className="h-2.5 w-2.5" /> 14 km/h ↗ NE
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">THERMAL RADIANCE</span>
+                <span className="text-slate-500 block text-[9px]">THERMAL RADIANCE</span>
                 <span className="font-mono font-semibold text-rose-400">
                   {((targetIncident.meanFRP || 342) + frpFlux).toFixed(1)} MW
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px]">SENSOR RESOLUTION</span>
-                <span className="font-semibold text-cyan-400">375m / I-Band</span>
+                <span className="text-slate-500 block text-[9px]">RESOLUTION</span>
+                <span className="font-semibold text-cyan-400">375m I-Band</span>
               </div>
             </div>
           </div>
