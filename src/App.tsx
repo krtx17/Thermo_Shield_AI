@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ActiveScreen, Hotspot, ModelMode } from "./types";
+import { ActiveScreen, Hotspot, ModelMode, UserProfile } from "./types";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Home from "./components/Home";
@@ -10,6 +10,9 @@ import IncidentReports from "./components/IncidentReports";
 import AuditTrail from "./components/AuditTrail";
 import SystemHealth from "./components/SystemHealth";
 import LiveDemo from "./components/LiveDemo";
+import ComputerVision from "./components/ComputerVision";
+import AboutHowItWorks from "./components/AboutHowItWorks";
+import OnboardingModal from "./components/OnboardingModal";
 import Settings from "./components/Settings";
 import { 
   Home as HomeIcon, 
@@ -128,8 +131,8 @@ export default function App() {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.replace("#", "") as ActiveScreen;
       const validScreens: ActiveScreen[] = [
-        "home", "command-center", "active-investigations", "risk-comparison",
-        "incident-reports", "audit-trail", "system-health", "live-demo", "settings"
+        "home", "command-center", "computer-vision", "active-investigations", "risk-comparison",
+        "incident-reports", "audit-trail", "system-health", "live-demo", "about", "settings"
       ];
       if (validScreens.includes(hash)) return hash;
       const saved = localStorage.getItem("thermo_shield_active_screen") as ActiveScreen;
@@ -144,7 +147,38 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Authenticated Operator State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem("thermo_shield_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Onboarding Walkthrough State for New Users
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
+    try {
+      return !localStorage.getItem("thermo_shield_onboarding_completed");
+    } catch {
+      return false;
+    }
+  });
+
+  const handleLogout = () => {
+    localStorage.removeItem("thermo_shield_jwt");
+    localStorage.removeItem("thermo_shield_user");
+    setCurrentUser(null);
+  };
+
+  const handleLoginSuccess = (user: UserProfile, isNewUser?: boolean) => {
+    setCurrentUser(user);
+    if (isNewUser || !localStorage.getItem("thermo_shield_onboarding_completed")) {
+      setIsOnboardingOpen(true);
+    }
+  };
 
   // Real-time WebSocket Telemetry stream
   const { isConnected: isLiveConnected, latestFlux } = useRealTimeTelemetry();
@@ -187,8 +221,8 @@ export default function App() {
     const handleHashChange = () => {
       const hash = window.location.hash.replace("#", "") as ActiveScreen;
       const validScreens: ActiveScreen[] = [
-        "home", "command-center", "active-investigations", "risk-comparison",
-        "incident-reports", "audit-trail", "system-health", "live-demo", "settings"
+        "home", "command-center", "computer-vision", "active-investigations", "risk-comparison",
+        "incident-reports", "audit-trail", "system-health", "live-demo", "about", "settings"
       ];
       if (validScreens.includes(hash)) {
         setActiveScreen(hash);
@@ -256,6 +290,8 @@ export default function App() {
           onClose={() => setIsSidebarOpen(false)}
           theme={theme}
           activeAlertsCount={criticalCount || 3}
+          currentUser={currentUser}
+          onOpenAuthModal={() => setIsAuthModalOpen(true)}
         />
       </div>
 
@@ -277,7 +313,10 @@ export default function App() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           isLiveConnected={isLiveConnected}
+          currentUser={currentUser}
           onOpenAuthModal={() => setIsAuthModalOpen(true)}
+          onLogout={handleLogout}
+          onOpenOnboarding={() => setIsOnboardingOpen(true)}
           onOpenDispatchModal={() => setIsDispatchModalOpen(true)}
         />
 
@@ -335,8 +374,16 @@ export default function App() {
             />
           )}
 
+          {activeScreen === "computer-vision" && (
+            <ComputerVision theme={theme} setActiveScreen={setActiveScreen} />
+          )}
+
           {activeScreen === "live-demo" && (
             <LiveDemo theme={theme} />
+          )}
+
+          {activeScreen === "about" && (
+            <AboutHowItWorks theme={theme} setActiveScreen={setActiveScreen} />
           )}
 
           {activeScreen === "audit-trail" && (
@@ -398,11 +445,20 @@ export default function App() {
 
       </div>
 
-      {/* Security Clearance Operator Login Modal */}
+      {/* Security Clearance Operator Login / Register Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onLoginSuccess={(user) => setCurrentUser(user)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Onboarding Steps Guided Walkthrough for New Users */}
+      <OnboardingModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        onComplete={() => setIsOnboardingOpen(false)}
+        setActiveScreen={setActiveScreen}
+        user={currentUser}
       />
 
       {/* Quick Tactical Hotspot / Anomaly Dispatch Modal */}

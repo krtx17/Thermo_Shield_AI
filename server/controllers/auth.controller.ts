@@ -51,6 +51,47 @@ export class AuthController {
     });
   }
 
+  public static register(req: Request, res: Response): void {
+    const { name, email, password, role } = req.body || {};
+
+    if (!name || !email || !password) {
+      res.status(400).json({ error: "Name, email, and password are required." });
+      return;
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const existing = OPERATORS.find((o) => o.email.toLowerCase() === normalizedEmail);
+
+    if (existing) {
+      res.status(409).json({ error: "An operator clearance already exists with this email address." });
+      return;
+    }
+
+    const newOperator = {
+      id: `OP-TS-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: name.trim(),
+      email: normalizedEmail,
+      role: role || "FIELD_OPERATOR",
+      passwordHash: password
+    };
+
+    OPERATORS.push(newOperator);
+
+    const user: AuthenticatedUser = {
+      id: newOperator.id,
+      name: newOperator.name,
+      email: newOperator.email,
+      role: newOperator.role
+    };
+
+    const token = generateToken(user);
+    res.status(201).json({
+      token,
+      user,
+      isNewUser: true
+    });
+  }
+
   public static getProfile(req: AuthRequest, res: Response): void {
     if (!req.user) {
       res.status(401).json({ error: "Unauthorized." });

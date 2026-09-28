@@ -31,7 +31,26 @@ export interface Hotspot {
   recommendation: string;
 }
 
-export type ActiveScreen = "home" | "command-center" | "active-investigations" | "risk-comparison" | "incident-reports" | "audit-trail" | "system-health" | "live-demo" | "settings";
+export type ActiveScreen = 
+  | "home" 
+  | "command-center" 
+  | "active-investigations" 
+  | "risk-comparison" 
+  | "incident-reports" 
+  | "audit-trail" 
+  | "system-health" 
+  | "live-demo" 
+  | "computer-vision"
+  | "about"
+  | "settings";
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+}
 
 export type ModelMode = "local" | "cloud";
 

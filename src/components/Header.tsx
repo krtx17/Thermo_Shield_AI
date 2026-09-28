@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { ActiveScreen, ModelMode } from "../types";
+import { ActiveScreen, ModelMode, UserProfile } from "../types";
 import { 
   Search, 
   Menu as MenuIcon, 
   ChevronDown,
-  X
+  X,
+  LogIn,
+  LogOut,
+  Shield,
+  HelpCircle,
+  Scan,
+  Sparkles
 } from "lucide-react";
 // @ts-ignore
 import profilePic from "../assets/images/kritika_profile.jpg";
@@ -21,7 +27,10 @@ interface HeaderProps {
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
   isLiveConnected?: boolean;
+  currentUser?: UserProfile | null;
   onOpenAuthModal?: () => void;
+  onLogout?: () => void;
+  onOpenOnboarding?: () => void;
   onOpenDispatchModal?: () => void;
 }
 
@@ -31,7 +40,10 @@ export default function Header({
   onMenuToggle,
   searchQuery = "",
   setSearchQuery,
+  currentUser,
   onOpenAuthModal,
+  onLogout,
+  onOpenOnboarding,
   onOpenDispatchModal
 }: HeaderProps) {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -40,15 +52,17 @@ export default function Header({
   const navLinks: { id: ActiveScreen; label: string }[] = [
     { id: "home", label: "Home" },
     { id: "command-center", label: "Live Map" },
+    { id: "computer-vision", label: "Computer Vision" },
     { id: "active-investigations", label: "Alerts" },
-    { id: "incident-reports", label: "Reports" },
+    { id: "live-demo", label: "Simulation" },
+    { id: "about", label: "How It Works" },
     { id: "system-health", label: "Analytics" },
   ];
 
   return (
     <header className="h-16 px-4 lg:px-8 flex items-center justify-between border-b transition-colors duration-200 z-30 sticky top-0 backdrop-blur-md bg-[#0b101d]/90 border-[#18233a] text-white">
       {/* Left side: Mobile menu toggle + Brand + Clickable Nav Links (Unboxed) */}
-      <div className="flex items-center gap-4 lg:gap-6">
+      <div className="flex items-center gap-3 lg:gap-6">
         <button
           onClick={onMenuToggle}
           className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
@@ -76,7 +90,7 @@ export default function Header({
         </div>
 
         {/* Clean, Unboxed Clickable Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = activeScreen === link.id;
             return (
@@ -96,8 +110,8 @@ export default function Header({
         </nav>
       </div>
 
-      {/* Right side: Clickable Search + Clickable Dispatch + Clickable Profile (All Unboxed) */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      {/* Right side: Clickable Search + Clickable Dispatch + Clickable Profile / Auth */}
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Minimal Unboxed Search Bar */}
         <div className="relative flex items-center">
           <div className="absolute left-2.5 text-slate-400 pointer-events-none">
@@ -112,8 +126,8 @@ export default function Header({
             placeholder="Search hotspots..."
             className={`pl-8 pr-3 py-1.5 text-xs sm:text-sm text-slate-200 placeholder-slate-500 rounded-lg transition-all focus:outline-none ${
               isSearchActive || searchQuery
-                ? "w-44 sm:w-64 bg-white/[0.07]"
-                : "w-32 sm:w-48 bg-white/[0.03] hover:bg-white/[0.05]"
+                ? "w-40 sm:w-56 bg-white/[0.07]"
+                : "w-28 sm:w-40 bg-white/[0.03] hover:bg-white/[0.05]"
             }`}
           />
           {searchQuery && (
@@ -126,7 +140,7 @@ export default function Header({
           )}
         </div>
 
-        {/* Clickable Quick Tactical Dispatch Action (Unboxed) */}
+        {/* Clickable Quick Tactical Dispatch Action */}
         {onOpenDispatchModal && (
           <button
             onClick={onOpenDispatchModal}
@@ -137,85 +151,126 @@ export default function Header({
           </button>
         )}
 
-        {/* Clickable Operator Profile (Unboxed) */}
-        <div className="relative">
-          <button
-            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            className="flex items-center gap-2 p-1 rounded-lg hover:bg-white/[0.05] transition-colors cursor-pointer select-none"
-            type="button"
-          >
-            <img
-              src={profilePic}
-              alt="Kritika Tripathi"
-              className="w-7 h-7 rounded-full object-cover"
-            />
-            <span className="hidden md:inline text-xs font-medium text-slate-200">
-              Kritika
-            </span>
-            <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
-          </button>
+        {/* Operator Profile / Login Button */}
+        {currentUser ? (
+          <div className="relative">
+            <button
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/[0.05] transition-colors cursor-pointer select-none"
+              type="button"
+            >
+              {currentUser.avatar ? (
+                <img
+                  src={currentUser.avatar}
+                  alt={currentUser.name}
+                  className="w-7 h-7 rounded-full object-cover"
+                />
+              ) : currentUser.name.toLowerCase().includes("kritika") ? (
+                <img
+                  src={profilePic}
+                  alt={currentUser.name}
+                  className="w-7 h-7 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-[#2563eb] text-white text-xs font-bold flex items-center justify-center">
+                  {currentUser.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="hidden md:inline text-xs font-semibold text-slate-200">
+                {currentUser.name.split(" ")[0]}
+              </span>
+              <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+            </button>
 
-          {/* Profile Dropdown Menu */}
-          {profileDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-2xl shadow-2xl border p-2 z-50 animate-in fade-in zoom-in-95 duration-100 bg-[#0f172a] border-[#1e2c4a] text-slate-200">
-              <div className="px-3 py-2 border-b border-[#1e2c4a]">
-                <p className="text-xs font-semibold text-white">Kritika Tripathi</p>
-                <p className="text-[11px] text-slate-400">Chief Geospatial Officer</p>
-                <p className="text-[10px] text-slate-500 font-mono mt-0.5">ID: OP-TS-8492</p>
-              </div>
+            {/* Profile Dropdown Menu */}
+            {profileDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl border p-2 z-50 animate-in fade-in zoom-in-95 duration-100 bg-[#0f172a] border-[#1e2c4a] text-slate-200">
+                <div className="px-3 py-2 border-b border-[#1e2c4a]">
+                  <p className="text-xs font-bold text-white">{currentUser.name}</p>
+                  <p className="text-[11px] text-[#38bdf8] font-medium">{currentUser.role.replace("_", " ")}</p>
+                  <p className="text-[10px] text-slate-500 font-mono mt-0.5">{currentUser.email}</p>
+                </div>
 
-              <div className="py-1">
-                {onOpenAuthModal && (
+                <div className="py-1">
+                  {onOpenOnboarding && (
+                    <button
+                      onClick={() => {
+                        onOpenOnboarding();
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 text-cyan-300 font-medium cursor-pointer flex items-center gap-2"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      <span>Replay Onboarding Tour</span>
+                    </button>
+                  )}
+
+                  {onOpenAuthModal && (
+                    <button
+                      onClick={() => {
+                        onOpenAuthModal();
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 text-blue-400 font-medium cursor-pointer flex items-center gap-2"
+                    >
+                      <Shield className="w-3.5 h-3.5" />
+                      <span>Switch Security Clearance</span>
+                    </button>
+                  )}
+
                   <button
                     onClick={() => {
-                      onOpenAuthModal();
+                      setActiveScreen("about");
                       setProfileDropdownOpen(false);
                     }}
-                    className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 text-blue-400 font-medium cursor-pointer"
+                    className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 cursor-pointer"
                   >
-                    Switch Security Clearance
+                    System Architecture & Mission
                   </button>
-                )}
-                {onOpenDispatchModal && (
+
                   <button
                     onClick={() => {
-                      onOpenDispatchModal();
+                      setActiveScreen("settings");
                       setProfileDropdownOpen(false);
                     }}
-                    className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 text-rose-400 font-medium cursor-pointer"
+                    className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 cursor-pointer"
                   >
-                    Manual Anomaly Dispatch
+                    System Preferences
                   </button>
-                )}
-                <button
-                  onClick={() => {
-                    setActiveScreen("settings");
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 cursor-pointer"
-                >
-                  System Preferences
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveScreen("system-health");
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-slate-800 cursor-pointer"
-                >
-                  Diagnostic Logs
-                </button>
-              </div>
 
-              <div className="pt-1 border-t border-[#1e2c4a]">
-                <div className="px-3 py-1 text-[10px] text-slate-500 flex items-center justify-between">
-                  <span>Thermo Shield AI</span>
-                  <span className="text-emerald-400 font-medium">v1.2.0 • Online</span>
+                  {onLogout && (
+                    <button
+                      onClick={() => {
+                        onLogout();
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-xs rounded-xl transition-colors hover:bg-rose-950/30 text-rose-400 font-semibold cursor-pointer flex items-center gap-2 mt-1 border-t border-[#1e2c4a] pt-2"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="pt-1 border-t border-[#1e2c4a]">
+                  <div className="px-3 py-1 text-[10px] text-slate-500 flex items-center justify-between">
+                    <span>Thermo Shield AI</span>
+                    <span className="text-emerald-400 font-medium">v1.2.0 • Online</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          /* Sign In / Register Button for unauthenticated users */
+          <button
+            onClick={onOpenAuthModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold transition-all shadow-md shadow-blue-600/30 cursor-pointer"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In / Register</span>
+          </button>
+        )}
       </div>
     </header>
   );

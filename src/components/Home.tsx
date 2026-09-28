@@ -13,7 +13,9 @@ import {
   MapPin, 
   Layers, 
   Sparkles, 
-  ChevronRight
+  ChevronRight,
+  Scan,
+  Info
 } from "lucide-react";
 
 interface HomeProps {
@@ -167,6 +169,22 @@ export default function Home({
             <p className="mt-1 text-[11px] sm:text-xs font-normal leading-relaxed text-slate-300 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] line-clamp-2 sm:line-clamp-none">
               Autonomous multispectral surveillance and thermal intelligence monitoring industrial fires across defense corridors and critical complexes.
             </p>
+            <div className="flex flex-wrap items-center gap-2 mt-2.5">
+              <button
+                onClick={() => setActiveScreen("computer-vision")}
+                className="px-2.5 py-1 rounded-lg bg-[#2563eb] hover:bg-[#1d4ed8] text-[10px] font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-blue-600/30"
+              >
+                <Scan className="w-3 h-3" />
+                <span>Computer Vision</span>
+              </button>
+              <button
+                onClick={() => setActiveScreen("about")}
+                className="px-2.5 py-1 rounded-lg bg-[#0f172a]/90 hover:bg-[#141d33] border border-[#1e2c4a] text-[10px] font-semibold text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+              >
+                <Info className="w-3 h-3 text-[#38bdf8]" />
+                <span>How It Works</span>
+              </button>
+            </div>
           </div>
           
           {/* Bottom-Left: Compact Telemetry Metric Cards (Strictly in Corner, Clears Globe) */}

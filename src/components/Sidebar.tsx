@@ -1,5 +1,5 @@
 import React from "react";
-import { ActiveScreen } from "../types";
+import { ActiveScreen, UserProfile } from "../types";
 import { 
   Home as HomeIcon, 
   Map as MapIcon, 
@@ -10,6 +10,9 @@ import {
   Sparkles, 
   Settings, 
   Shield,
+  Scan,
+  Info,
+  LogIn,
   X
 } from "lucide-react";
 
@@ -20,6 +23,8 @@ interface SidebarProps {
   onClose: () => void;
   theme?: "light" | "dark";
   activeAlertsCount?: number;
+  currentUser?: UserProfile | null;
+  onOpenAuthModal?: () => void;
 }
 
 export default function Sidebar({
@@ -27,16 +32,20 @@ export default function Sidebar({
   setActiveScreen,
   isOpen,
   onClose,
-  activeAlertsCount = 3
+  activeAlertsCount = 3,
+  currentUser,
+  onOpenAuthModal
 }: SidebarProps) {
   const navItems: { id: ActiveScreen; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: "home", label: "Home", icon: HomeIcon },
     { id: "command-center", label: "Live Map", icon: MapIcon },
+    { id: "computer-vision", label: "Computer Vision", icon: Scan },
     { id: "active-investigations", label: "Alerts", icon: Bell, badge: activeAlertsCount },
+    { id: "live-demo", label: "Simulation", icon: Sparkles },
+    { id: "about", label: "How It Works", icon: Info },
     { id: "system-health", label: "Analytics", icon: BarChart2 },
     { id: "incident-reports", label: "Reports", icon: FileText },
     { id: "risk-comparison", label: "Compare", icon: GitCompare },
-    { id: "live-demo", label: "Simulation", icon: Sparkles },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -56,9 +65,9 @@ export default function Sidebar({
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5 overflow-y-auto">
           {/* Brand Header */}
-          <div className="flex items-center justify-between px-2 pt-1">
+          <div className="flex items-center justify-between px-2 pt-1 shrink-0">
             <div 
               onClick={() => { setActiveScreen("home"); onClose(); }}
               className="flex items-center gap-2.5 cursor-pointer group"
@@ -67,7 +76,7 @@ export default function Sidebar({
                 <img 
                   src="/app_icon.png" 
                   alt="Thermo Shield AI Icon" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover" 
                 />
               </div>
               <div className="flex flex-col">
@@ -104,20 +113,20 @@ export default function Sidebar({
                     setActiveScreen(item.id);
                     onClose();
                   }}
-                  className={`w-full h-10 px-3.5 rounded-xl text-sm font-medium text-left transition-all duration-200 flex items-center justify-between cursor-pointer ${
+                  className={`w-full h-9.5 px-3 rounded-xl text-xs font-medium text-left transition-all duration-150 flex items-center justify-between cursor-pointer ${
                     isActive
                       ? "bg-[#2563eb] text-white shadow-sm shadow-blue-600/30 font-semibold"
                       : "text-[#8e9db7] hover:text-white hover:bg-[#141d33]"
                   }`}
                   type="button"
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? "text-white" : ""}`} />
-                    <span>{item.label}</span>
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-white" : ""}`} />
+                    <span className="truncate">{item.label}</span>
                   </div>
 
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold leading-none ${
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold leading-none ${
                       isActive 
                         ? "bg-white text-[#2563eb]" 
                         : "bg-rose-500 text-white shadow-sm"
@@ -131,24 +140,37 @@ export default function Sidebar({
           </nav>
         </div>
 
-        {/* Bottom Status Widget */}
-        <div className="px-2 pt-4">
-          <div className="p-3 rounded-xl border flex items-center gap-2.5 bg-[#10172a] border-[#1b2742] text-slate-300">
-            <div className="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
-              <Shield className="h-4 w-4 text-[#2563eb]" />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[11px] font-semibold leading-tight text-white">
-                  Orbital Defense
-                </span>
+        {/* Bottom Operator Status Widget */}
+        <div className="px-2 pt-3 border-t border-[#18233a] shrink-0">
+          {currentUser ? (
+            <div className="p-2.5 rounded-xl border flex items-center justify-between bg-[#10172a] border-[#1b2742] text-slate-300">
+              <div className="flex items-center gap-2 truncate">
+                <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-[#38bdf8] flex items-center justify-center shrink-0 text-xs font-bold">
+                  {currentUser.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex flex-col truncate">
+                  <span className="text-[11px] font-bold text-white truncate leading-tight">
+                    {currentUser.name}
+                  </span>
+                  <span className="text-[9px] text-[#38bdf8] font-mono leading-tight mt-0.5">
+                    {currentUser.role.replace("_", " ")}
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] leading-tight text-slate-400 mt-0.5">
-                VIIRS & Sentinel-2 Active
-              </span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" title="Clearance Verified" />
             </div>
-          </div>
+          ) : (
+            <button
+              onClick={() => {
+                if (onOpenAuthModal) onOpenAuthModal();
+                onClose();
+              }}
+              className="w-full p-2.5 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 text-[#38bdf8] text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In / Register</span>
+            </button>
+          )}
         </div>
       </aside>
     </>
