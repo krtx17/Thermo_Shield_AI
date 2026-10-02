@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Hotspot, ActiveScreen } from "../types";
 import Globe from "./originkit/ui/globe";
 import { 
@@ -54,6 +54,42 @@ export default function Home({
   const [timeRange, setTimeRange] = useState<"1H" | "6H" | "24H" | "7D">("6H");
   const [scrubberValue, setScrubberValue] = useState(72);
   const [zoomLevel, setZoomLevel] = useState(1);
+
+  // Dynamic typewriter text animation for defense capabilities
+  const typewriterPhrases = useMemo(() => [
+    "Autonomous Spaceborne Defense",
+    "Real-Time Flashover Detection",
+    "1200 LPM Deluge Suppression",
+    "Multispectral Thermal Telemetry"
+  ], []);
+
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [subCharIdx, setSubCharIdx] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentPhrase = typewriterPhrases[phraseIdx];
+    const typingSpeed = isDeleting ? 30 : 65;
+
+    if (!isDeleting && subCharIdx === currentPhrase.length) {
+      const timeout = setTimeout(() => setIsDeleting(true), 2000);
+      return () => clearTimeout(timeout);
+    }
+
+    if (isDeleting && subCharIdx === 0) {
+      setIsDeleting(false);
+      setPhraseIdx((prev) => (prev + 1) % typewriterPhrases.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubCharIdx((prev) => prev + (isDeleting ? -1 : 1));
+    }, typingSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [subCharIdx, isDeleting, phraseIdx, typewriterPhrases]);
+
+  const displayText = typewriterPhrases[phraseIdx].substring(0, subCharIdx);
 
   const defaultFallback: Hotspot = {
     id: "EVT-20260903-0042",
@@ -162,9 +198,19 @@ export default function Home({
           {/* ===================================================================== */}
           
           {/* Top-Left: Project Mission & AI Intelligence Header (Strictly in Corner, Clears Globe) */}
-          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 max-w-[260px] sm:max-w-sm pointer-events-auto">
-            <h1 className="text-sm sm:text-xl font-extrabold tracking-tight leading-snug text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-              AI-Powered Detection<br />for a Safer Tomorrow
+          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 max-w-[280px] sm:max-w-md pointer-events-auto">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xs uppercase tracking-widest font-black text-orange-400 flex items-center gap-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                <Flame className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+                THERMO SHIELD AI
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/40">
+                ACTIVE
+              </span>
+            </div>
+            <h1 className="text-base sm:text-2xl font-black tracking-tight leading-snug text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] min-h-[2.5rem] sm:min-h-[3.8rem]">
+              {displayText}
+              <span className="inline-block w-1 h-4 sm:h-6 ml-1.5 bg-orange-500 animate-pulse align-middle" />
             </h1>
             <p className="mt-1 text-[11px] sm:text-xs font-normal leading-relaxed text-slate-300 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] line-clamp-2 sm:line-clamp-none">
               Autonomous multispectral surveillance and thermal intelligence monitoring industrial fires across defense corridors and critical complexes.
@@ -172,7 +218,7 @@ export default function Home({
             <div className="flex flex-wrap items-center gap-2 mt-2.5">
               <button
                 onClick={() => setActiveScreen("command-center")}
-                className="px-2.5 py-1 rounded-lg bg-[#2563eb] hover:bg-[#1d4ed8] text-[10px] font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-blue-600/30"
+                className="px-2.5 py-1 rounded-lg bg-[#ea580c] hover:bg-[#c2410c] text-[10px] font-bold text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-orange-600/30"
               >
                 <Compass className="w-3 h-3" />
                 <span>3D Live Map</span>

@@ -1,9 +1,11 @@
 <p align="center">
-  <img src="public/thermo_shield_banner.jpg" alt="Thermo Shield AI — Autonomous Spaceborne Thermal Defense" width="100%" style="border-radius: 16px; box-shadow: 0 8px 32px rgba(234, 88, 12, 0.25);" />
+  <a href="https://thermo-shield-ai-rust.vercel.app/">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=900&size=34&duration=2400&pause=1000&color=F97316&center=true&vCenter=true&width=850&height=75&lines=%E2%9A%A1+THERMO+SHIELD+AI+%F0%9F%94%A5;AUTONOMOUS+SPACEBORNE+DEFENSE;REAL-TIME+FLASHOVER+DETECTION;1200+LPM+PERIMETER+DELUGE;MULTISPECTRAL+THERMAL+TELEMETRY" alt="Thermo Shield AI Animated Typing" />
+  </a>
 </p>
 
 <h1 align="center">
-  🔥 THERMO SHIELD AI 🛰️
+  <b>🛡️ <span style="color: #ea580c;">THERMO SHIELD AI</span> 🛰️</b>
 </h1>
 
 <p align="center">
